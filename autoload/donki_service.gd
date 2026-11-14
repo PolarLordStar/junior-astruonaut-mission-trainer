@@ -245,8 +245,6 @@ func _convert(raw: Dictionary) -> Array:
 			"details": {
 				"NASA class": class_full,
 				"Began": _s(f.get("beginTime", "")),
-				"Peak": _s(f.get("peakTime", "")),
-				"Ended": _s(f.get("endTime", "")),
 			},
 		})
 
@@ -260,7 +258,6 @@ func _convert(raw: Dictionary) -> Array:
 			"action": "Prepare the outpost",
 			"details": {
 				"Started": _s(c.get("startTime", "")),
-				"Speed": _cme_speed(c),
 			},
 		})
 
