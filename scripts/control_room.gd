@@ -1,3 +1,4 @@
+class_name ControlRoom
 extends Node3D
 ## Mars control room built from the Kenney Space Station Kit (.glb files).
 ## Every model is measured when the scene starts, so no manual scaling is needed.
@@ -73,25 +74,19 @@ var _dust_amt: float:
 var tile := 2.0
 var wall_h := 2.0
 var cam: Camera3D
-var _steam: Array[MeshInstance3D] = []
 var _light: OmniLight3D
 var _alert_light: OmniLight3D
 var _haze_mat: ShaderMaterial
 var _led_green: MeshInstance3D
 var _led_red: MeshInstance3D
-var _screens := {}
 var _menu: PauseMenu
+var outside: RoomOutside     # sky, ground, sun, dust clouds   (room_outside.gd)
+var desk_rig: RoomDesk       # desk, monitors, consoles          (room_desk.gd)
+var decor: RoomDecor         # racks, lockers, pipes, cables     (room_decor.gd)
 var _flicker := 0.0
 var _shake := 0.0
 var _shake_off := Vector2.ZERO
 var _sun_light: DirectionalLight3D
-var _sun_core: MeshInstance3D
-var _sun_halo: MeshInstance3D
-var _flare_root: Node3D
-var _flare_amt := 0.0
-var _clouds: Array[MeshInstance3D] = []
-var _rack_leds: Array[MeshInstance3D] = []
-var _rack_timer := 0.0
 var _grunge_cache := {}
 var _warnings: Array = []     # active warnings, rebuilt every frame (shown on monitor 3)
 var window_bars: Array[MeshInstance3D] = []   # the 2 bars between the window panes: window_bars[0].hide() removes one
@@ -111,11 +106,14 @@ func _ready() -> void:
 	_lighting()
 	_shell(fs.y)
 	_big_window()
-	_outside()
-	var desk := _desk()
+	outside = RoomOutside.new(self)
+	desk_rig = RoomDesk.new(self)
+	decor = RoomDecor.new(self)
+	outside.build()
+	var desk := desk_rig.build()
 	_camera(desk)
 	_props(desk)
-	_decor()
+	decor.build()
 	_vignette()
 	_pause_menu()
 
@@ -125,13 +123,10 @@ func _process(delta: float) -> void:
 	_storm_visuals(delta)
 	_update_warning_lights()
 	_flicker_light(delta)
-	_extras(delta)
+	decor.update(delta)
+	outside.update(delta)
 	_push_screens()
-	for st in _steam:
-		var ph := fmod(Time.get_ticks_msec() / 1000.0 * 0.4 + float(st.get_meta("phase")), 1.0)
-		st.position = Vector3(sin(ph * 6.0) * 0.03, 0.24 + ph * 0.35, 0.0)
-		st.scale = Vector3.ONE * (0.8 + ph)
-		(st.material_override as StandardMaterial3D).albedo_color.a = (1.0 - ph) * 0.5
+	desk_rig.update()
 	# FNAF-style look-around: move the mouse left/right to turn the view.
 	var vp := get_viewport()
 	var m := vp.get_mouse_position() / vp.get_visible_rect().size
@@ -173,7 +168,8 @@ func _pause_menu() -> void:
 
 func _on_restart() -> void:
 	get_tree().paused = false
-	get_tree().reload_current_scene()	
+	get_tree().reload_current_scene()
+
 
 func _on_options() -> void:
 	# TODO: options screen (to be decided).
@@ -229,7 +225,7 @@ func _set_led(led: MeshInstance3D, on: bool) -> void:
 
 
 func _push_screens() -> void:
-	var st: ScreenUI = _screens.get("status")
+	var st: ScreenUI = desk_rig.screens.get("status")
 	if st != null:
 		st.power = _val("power")
 		st.oxygen = _val("oxygen")
@@ -239,13 +235,13 @@ func _push_screens() -> void:
 		if clock != null:
 			st.sol = clock.sol
 			st.clock_s = clock.clock_s
-	var env: EnvironmentScreen = _screens.get("environment")
+	var env: EnvironmentScreen = desk_rig.screens.get("environment")
 	if env != null:
 		for id in env.rows.keys():
 			env.set_value(id, _val(id))
 		if clock != null:
 			env.set_time(clock.sol, clock.clock_s)
-	var al: WarningsScreen = _screens.get("alerts")
+	var al: WarningsScreen = desk_rig.screens.get("alerts")
 	if al != null:
 		al.set_warnings(_warnings)
 
@@ -352,7 +348,6 @@ func _kit(model: String) -> Node3D:
 	holder.add_child(inst)
 	holder.set_meta("size", bb.size)
 	return holder
-
 
 
 func _size(model: String) -> Vector3:
@@ -530,289 +525,6 @@ void fragment() {
 	add_child(haze)
 
 
-func _dust() -> void:
-	var d := ROWS * tile
-	for i in 4:
-		var m := MeshInstance3D.new()
-		var sm := SphereMesh.new()
-		sm.radius = tile
-		sm.height = tile * 1.2
-		m.mesh = sm
-		m.material_override = _glow_mat(Color(0.8, 0.5, 0.3, 0.3))
-		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		m.position = Vector3(-tile * 2.0 + i * tile * 1.4, wall_h * 0.5, -d - tile * (1.2 + (i % 2) * 0.6))
-		m.scale = Vector3(1.6, 0.8, 1.0)
-		m.set_meta("base_pos", m.position)
-		add_child(m)
-		_clouds.append(m)
-
-
-func _glow_mat(color: Color) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.albedo_color = color
-	if color.a < 1.0:
-		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	return m
-
-
-func _flat(pos: Vector3, flat_size: Vector3, color: Color) -> void:
-	var m := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = flat_size
-	m.mesh = bm
-	m.material_override = _glow_mat(color)
-	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	m.position = pos
-	add_child(m)
-
-
-func _blob(pos: Vector3, scl: Vector3, color: Color) -> void:
-	var m := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = 1.0
-	sm.height = 2.0
-	m.mesh = sm
-	m.material_override = _glow_mat(color)
-	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	m.position = pos
-	m.scale = scl
-	add_child(m)
-
-
-func _cone(pos: Vector3, radius: float, h: float, color: Color) -> void:
-	var m := MeshInstance3D.new()
-	var cm := CylinderMesh.new()
-	cm.top_radius = 0.0
-	cm.bottom_radius = radius
-	cm.height = h
-	cm.radial_segments = 5
-	m.mesh = cm
-	m.material_override = _glow_mat(color)
-	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	m.position = pos + Vector3(0, h / 2.0, 0)
-	add_child(m)
-
-
-func _orb(pos: Vector3, radius: float, color: Color) -> MeshInstance3D:
-	var m := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = radius
-	sm.height = radius * 2.0
-	m.mesh = sm
-	m.material_override = _glow_mat(color)
-	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	m.position = pos
-	add_child(m)
-	return m
-
-
-func _outside() -> void:
-	var d := ROWS * tile
-	var s := tile / 2.0
-	var gy := 1.2 * s   # ground height
-	# sky with a gradient: deep rust at the top, dusty peach at the horizon
-	var sky := MeshInstance3D.new()
-	var q := QuadMesh.new()
-	q.size = Vector2(90, 40) * s
-	sky.mesh = q
-	var sh := Shader.new()
-	sh.code = """shader_type spatial;
-render_mode unshaded;
-uniform vec3 top_col : source_color = vec3(0.36, 0.16, 0.10);
-uniform vec3 low_col : source_color = vec3(0.95, 0.62, 0.38);
-uniform float y0 = 0.5;
-uniform float y1 = 6.0;
-varying float wy;
-void vertex() { wy = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y; }
-void fragment() { ALBEDO = mix(low_col, top_col, smoothstep(y0, y1, wy)); }
-"""
-	var smat := ShaderMaterial.new()
-	smat.shader = sh
-	smat.set_shader_parameter("y0", gy)
-	smat.set_shader_parameter("y1", wall_h * 1.6)
-	sky.material_override = smat
-	sky.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	sky.position = Vector3(0, 14 * s, -d - 15 * s)
-	add_child(sky)
-	# ground, far mesas, dunes (far ones are paler, like dusty haze)
-	_flat(Vector3(0, 0.6 * s, -d - 9 * s), Vector3(90, 1.2, 18) * s, Color("a35a2b"))
-	_cone(Vector3(-9 * s, gy, -d - 13 * s), 5 * s, 3.2 * s, Color("c58b5e"))
-	_cone(Vector3(2 * s, gy, -d - 14 * s), 6 * s, 2.4 * s, Color("c58b5e"))
-	_cone(Vector3(11 * s, gy, -d - 13 * s), 5 * s, 3.6 * s, Color("bd8254"))
-	_blob(Vector3(-4 * s, gy, -d - 6 * s), Vector3(6, 0.9, 3) * s, Color("b87140"))
-	_blob(Vector3(6 * s, gy, -d - 7 * s), Vector3(7, 1.1, 3) * s, Color("ad6536"))
-	_blob(Vector3(-1 * s, gy * 0.9, -d - 2.5 * s), Vector3(4, 0.5, 1.6) * s, Color("9a4f27"))
-	_blob(Vector3(5 * s, gy * 0.9, -d - 3 * s), Vector3(3.5, 0.45, 1.4) * s, Color("9d532a"))
-	# small habitat dome with a lit window and an antenna
-	var dome := MeshInstance3D.new()
-	var dm := SphereMesh.new()
-	dm.radius = 0.8 * s
-	dm.height = 0.8 * s
-	dm.is_hemisphere = true
-	dome.mesh = dm
-	dome.material_override = _glow_mat(Color("d8d9f5"))
-	dome.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	dome.position = Vector3(-4 * s, gy + 0.85 * s, -d - 6 * s)
-	add_child(dome)
-	_flat(Vector3(-4 * s, gy + 1.1 * s, -d - 5.2 * s), Vector3(0.5, 0.25, 0.05) * s, Color("ffd36b"))
-	_flat(Vector3(-3.1 * s, gy + 1.5 * s, -d - 6 * s), Vector3(0.06, 1.3, 0.06) * s, Color("d8d9f5"))
-	_flat(Vector3(-3.1 * s, gy + 2.2 * s, -d - 6 * s), Vector3(0.16, 0.16, 0.16) * s, Color("ff5a4a"))
-	# sun with a glow; during a solar flare it swells and shoots out orange spikes
-	var sun_pos := Vector3(2.0 * s, wall_h * 0.6, -d - 12 * s)
-	_sun_core = _orb(sun_pos, 2.2 * s, Color("fff0a8"))
-	_sun_halo = _orb(sun_pos, 4.0 * s, Color(1.0, 0.85, 0.4, 0.25))
-	_flare_root = Node3D.new()
-	_flare_root.position = sun_pos + Vector3(0, 0, 0.2)
-	add_child(_flare_root)
-	for i in 12:
-		var arm := Node3D.new()
-		arm.rotation_degrees.z = i * 30.0 + (i % 3) * 7.0
-		_flare_root.add_child(arm)
-		var spike_len := (2.2 + float(i % 4) * 1.1) * s
-		var sp := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(0.45 * s, spike_len, 0.02)
-		sp.mesh = bm
-		sp.material_override = _glow_mat(Color(1.0, 0.5, 0.12, 0.75))
-		sp.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		sp.position = Vector3(0, 2.0 * s + spike_len / 2.0, 0)
-		arm.add_child(sp)
-	_flare_root.visible = false
-	_dust()
-
-
-func _tea_cup(parent: Node3D, pos: Vector3) -> void:
-	var cup := Node3D.new()
-	cup.position = pos
-	cup.scale = Vector3.ONE * 1.4
-	parent.add_child(cup)
-	var white := Color("f4f4ff")
-	var sc := CylinderMesh.new()
-	sc.top_radius = 0.26
-	sc.bottom_radius = 0.2
-	sc.height = 0.025
-	_cup_part(cup, sc, white, Vector3(0, 0.0125, 0))
-	var cm := CylinderMesh.new()
-	cm.top_radius = 0.17
-	cm.bottom_radius = 0.11
-	cm.height = 0.18
-	_cup_part(cup, cm, white, Vector3(0, 0.115, 0))
-	var tm := CylinderMesh.new()
-	tm.top_radius = 0.155
-	tm.bottom_radius = 0.155
-	tm.height = 0.01
-	_cup_part(cup, tm, Color("9a4a1e"), Vector3(0, 0.195, 0))
-	var hm := TorusMesh.new()
-	hm.inner_radius = 0.03
-	hm.outer_radius = 0.075
-	var handle := _cup_part(cup, hm, white, Vector3(0.2, 0.125, 0))
-	handle.rotation_degrees.x = 90.0
-	for i in 3:
-		var st := MeshInstance3D.new()
-		var ss := SphereMesh.new()
-		ss.radius = 0.035
-		ss.height = 0.07
-		st.mesh = ss
-		var m := _mat(Color(1, 1, 1, 0.5))
-		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		st.material_override = m
-		st.set_meta("phase", i * 0.33)
-		cup.add_child(st)
-		_steam.append(st)
-
-
-func _cup_part(parent: Node3D, mesh: Mesh, color: Color, pos: Vector3) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	mi.mesh = mesh
-	mi.material_override = _mat(color)
-	mi.position = pos
-	parent.add_child(mi)
-	return mi
-
-
-func _desk() -> Dictionary:
-	var model := "table-large"
-	var s := _size(model)
-	if s == Vector3.ZERO:
-		model = "table"
-		s = _size(model)
-	var pos := Vector3(0, 0, -ROWS * tile * DESK_AT)
-	var n := _place(model, pos, 0.0, true, DESK_TINT)
-	var width := maxf(s.x, s.z) if n != null else tile * 2.0
-	var depth := minf(s.x, s.z) if n != null else tile
-	var top := s.y if n != null else 0.8
-	# monitor rig: built at a "5 wide desk" scale, then scaled to fit the real desk
-	var u := (width / 5.0) * 0.9
-	var rig := Node3D.new()
-	rig.position = Vector3(pos.x, top, pos.z)
-	rig.scale = Vector3.ONE * u
-	add_child(rig)
-	# three monitors, the outer two angled towards the player
-	_monitor(rig, "status", Vector3(-1.7, 0.62, -0.2), 16.0)          # left: life support (unchanged)
-	_monitor(rig, "environment", Vector3(0.0, 0.62, -0.42), 0.0)      # middle: radiation / oxygen / perchlorate
-	_monitor(rig, "alerts", Vector3(1.7, 0.62, -0.2), -16.0)          # right: warnings only
-	_box(rig, Vector3(0, 0.02, 0.45), Vector3(1.1, 0.04, 0.35), DARK)              # keyboard
-	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
-	_box(rig, Vector3(1.05, 0.035, 0.5), Vector3(0.1, 0.04, 0.16), Color("2b2d36"))  # mouse
-	_box(rig, Vector3(0, -0.01, depth * 0.5 / u), Vector3(width / u, 0.05, 0.05), TRIM)   # orange front edge
-	_tea_cup(rig, Vector3(-1.9, 0.0, 0.55))
-	# cool glow from the screens onto the desk
-	var glow := OmniLight3D.new()
-	glow.light_color = Color("7fd8ff")
-	glow.light_energy = 0.5
-	glow.omni_range = 3.5
-	glow.position = Vector3(0, 0.9, 0.8)
-	rig.add_child(glow)
-	# angled side consoles, like the wrap-around desk in the reference
-	var lw := _wing(-1.0, pos, width, depth, top)
-	var tablet := _box(lw, Vector3(-0.1, 0.045, 0.12), Vector3(0.42, 0.02, 0.3), Color("14151a"))
-	tablet.rotation_degrees.y = 14.0
-	_dim(_box(tablet, Vector3(0, 0.0105, 0), Vector3(0.38, 0.003, 0.26), Color("8fb4d6"), true), 0.9)
-	var paper := _box(lw, Vector3(0.35, 0.042, -0.05), Vector3(0.3, 0.012, 0.22), Color("cfc6b0"))
-	paper.rotation_degrees.y = -12.0
-	_headphones(lw, Vector3(-0.42, 0.04, 0.05))
-	var rw := _wing(1.0, pos, width, depth, top)
-	_console(rw)
-	_no_shadow(lw)
-	_no_shadow(rw)
-	return {"pos": pos, "top": top, "width": width}
-
-
-func _monitor(parent: Node3D, kind: String, pos: Vector3, yaw: float) -> void:
-	var bezel := _box(parent, pos, Vector3(1.52, 0.95, 0.07), DARK)
-	bezel.rotation_degrees.y = yaw
-	var stand_h := pos.y - 0.475 + 0.04
-	_box(parent, Vector3(pos.x, stand_h / 2.0, pos.z), Vector3(0.14, stand_h, 0.14), LAV_DARK)
-	var vp := SubViewport.new()
-	vp.size = Vector2i(int(ScreenUI.W), int(ScreenUI.H))
-	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	add_child(vp)
-	var ui: Control
-	match kind:
-		"environment":
-			ui = EnvironmentScreen.new()
-		"alerts":
-			ui = WarningsScreen.new()
-		_:
-			var status_ui := ScreenUI.new()
-			status_ui.mode = kind
-			ui = status_ui
-	ui.name = "Screen_" + kind
-	vp.add_child(ui)
-	_screens[kind] = ui
-	var quad := MeshInstance3D.new()
-	var q := QuadMesh.new()
-	q.size = Vector2(1.4, 0.875)
-	quad.mesh = q
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_texture = vp.get_texture()
-	quad.material_override = mat
-	quad.position = Vector3(0, 0, 0.04)
-	bezel.add_child(quad)
-
-
 func _props(desk: Dictionary) -> void:
 	var w := COLS * tile
 	var d := ROWS * tile
@@ -908,191 +620,6 @@ func _patch(pos: Vector3, r: float) -> void:
 	_box(root, Vector3(r * 0.2, -r * 0.25, 0.04), Vector3(r * 0.1, r * 0.3, 0.012), TRIM)
 	var flame := _box(root, Vector3(0, -r * 0.55, 0.045), Vector3(r * 0.5, r * 0.08, 0.012), Color("ff7a2a"), true)
 	_dim(flame, 0.8)
-
-
-func _wing(side: float, pos: Vector3, width: float, depth: float, top: float) -> Node3D:
-	var length := 1.3
-	var wing := Node3D.new()
-	wing.position = Vector3(pos.x + side * (width / 2.0 + 0.46), top - 0.05, pos.z + depth * 0.1 + 0.33)
-	wing.rotation_degrees.y = -side * 30.0
-	add_child(wing)
-	var slab := _box(wing, Vector3.ZERO, Vector3(length, 0.07, depth * 0.9), Color("3b3d45"))
-	slab.material_override = _grunge(Color("3b3d45"))
-	_box(wing, Vector3(0, 0, depth * 0.45), Vector3(length, 0.08, 0.05), TRIM)   # orange edge trim
-	var base_h := top - 0.07
-	_box(wing, Vector3(0, -0.045 - base_h / 2.0, 0), Vector3(length * 0.88, base_h, depth * 0.78), HULL)
-	return wing
-
-
-func _headphones(parent: Node3D, pos: Vector3) -> void:
-	var root := Node3D.new()
-	root.position = pos
-	root.rotation_degrees.y = 25.0
-	parent.add_child(root)
-	var band := MeshInstance3D.new()
-	var tm := TorusMesh.new()
-	tm.inner_radius = 0.09
-	tm.outer_radius = 0.13
-	band.mesh = tm
-	band.material_override = _mat(Color("16171c"))
-	band.scale = Vector3(1.0, 1.0, 0.8)
-	root.add_child(band)
-	for sx in [-1.0, 1.0]:
-		var cup := _cyl(root, Vector3(sx * 0.11, 0.0, 0.0), 0.075, 0.07, Color("0f1014"))
-		cup.rotation_degrees.z = 90.0
-
-
-func _console(wing: Node3D) -> void:
-	var con := Node3D.new()
-	con.position = Vector3(0, 0.035, -0.1)
-	wing.add_child(con)
-	_box(con, Vector3(0, 0.12, 0), Vector3(0.9, 0.24, 0.5), Color("55453e"))
-	var tilt := Node3D.new()
-	tilt.position = Vector3(0, 0.26, 0.0)
-	tilt.rotation_degrees.x = -22.0
-	con.add_child(tilt)
-	_box(tilt, Vector3.ZERO, Vector3(0.9, 0.03, 0.46), Color("2b2c33"))
-	_dial(tilt, Vector3(-0.22, 0.02, -0.1), 0.12)
-	_dial(tilt, Vector3(0.22, 0.02, -0.1), 0.12)
-	var bcols := [Color("ff3b2a"), Color("ffb02e"), Color("6b6f7a"), Color("ff3b2a"), Color("4ade80")]
-	for row in 2:
-		for k in 5:
-			var bc: Color = bcols[(k + row) % 5]
-			_box(tilt, Vector3(-0.32 + k * 0.16, 0.025, 0.08 + row * 0.1), Vector3(0.07, 0.03, 0.06), bc, (k + row) % 3 == 0)
-
-
-func _dial(parent: Node3D, pos: Vector3, r: float) -> void:
-	_cyl(parent, pos, r, 0.02, Color("101114"))
-	var face := _cyl(parent, pos + Vector3(0, 0.008, 0), r * 0.82, 0.02, Color("ffb02e"), true)
-	_dim(face, 0.8)
-	var needle := _box(parent, pos + Vector3(0, 0.02, 0), Vector3(r * 0.08, 0.006, r * 0.7), Color("1b1b1f"))
-	needle.rotation_degrees.y = randf_range(-50.0, 50.0)
-
-
-## Worn-industrial dressing: server racks, lockers, ceiling beams, pipes and cables.
-func _decor() -> void:
-	var w := COLS * tile
-	var d := ROWS * tile
-	var rx := w / 2.0 - 0.42
-	_rack(-rx, -d * 0.58, 90.0)
-	_rack(-rx, -d * 0.58 - 0.95, 90.0)
-	_locker(rx, -d * 0.58, -90.0)
-	_locker(rx, -d * 0.58 - 0.95, -90.0)
-	_ceiling()
-	_wall_conduits()
-	_cables()
-
-
-func _rack(x: float, z: float, yaw: float) -> void:
-	var r := Node3D.new()
-	r.position = Vector3(x, 0, z)
-	r.rotation_degrees.y = yaw
-	add_child(r)
-	var body := _box(r, Vector3(0, 1.05, 0), Vector3(0.9, 2.1, 0.7), HULL)
-	body.material_override = _grunge(Color("2a2b33"))
-	_box(r, Vector3(0, 2.1, 0), Vector3(0.96, 0.05, 0.76), TRIM.darkened(0.3))
-	var cols := [Color("4ade80"), Color("ffb02e"), Color("5ee0f0"), Color("ff5a4a")]
-	for row in 8:
-		var y := 0.35 + row * 0.22
-		_box(r, Vector3(0, y, 0.355), Vector3(0.8, 0.16, 0.03), Color("0e0f14"))
-		for k in 4:
-			var c: Color = cols[(row + k) % 4]
-			var led := _box(r, Vector3(-0.3 + k * 0.1, y, 0.375), Vector3(0.035, 0.035, 0.015), c, true)
-			led.set_meta("base", c)
-			_rack_leds.append(led)
-
-
-func _locker(x: float, z: float, yaw: float) -> void:
-	var r := Node3D.new()
-	r.position = Vector3(x, 0, z)
-	r.rotation_degrees.y = yaw
-	add_child(r)
-	var body := _box(r, Vector3(0, 1.05, 0), Vector3(0.9, 2.1, 0.7), Color("5a5e66"))
-	body.material_override = _grunge(Color("5a5e66"))
-	_box(r, Vector3(0, 1.05, 0.355), Vector3(0.02, 2.0, 0.02), Color("20222a"))
-	for sx in [-1.0, 1.0]:
-		for i in 5:
-			_box(r, Vector3(sx * 0.22, 1.7 + i * 0.07, 0.36), Vector3(0.3, 0.025, 0.02), Color("1d1f26"))
-		_box(r, Vector3(sx * 0.07, 1.05, 0.37), Vector3(0.03, 0.25, 0.04), Color("8a8f99"))
-		_box(r, Vector3(sx * 0.22, 1.4, 0.36), Vector3(0.2, 0.06, 0.01), TRIM)
-
-
-func _ceiling() -> void:
-	var w := COLS * tile
-	var d := ROWS * tile
-	var y := wall_h - 0.03
-	for k in 4:
-		_box(self, Vector3(0, y - 0.07, -d * (0.15 + 0.25 * k)), Vector3(w, 0.14, 0.2), Color("2a2b32"))
-	for sx in [-1.0, 1.0]:
-		var p1 := _cyl(self, Vector3(sx * 1.6, y - 0.18, -d / 2.0), 0.07, d, Color("4a3a36"))
-		p1.rotation_degrees.x = 90.0
-		var p2 := _cyl(self, Vector3(sx * 2.2, y - 0.16, -d / 2.0), 0.04, d, TRIM.darkened(0.35))
-		p2.rotation_degrees.x = 90.0
-		_dim(_box(self, Vector3(sx * 3.2, y, -d * 0.45), Vector3(0.9, 0.03, 0.5), Color("ff3b2a"), true), 0.7)
-	_dim(_box(self, Vector3(0, y, -d * 0.5), Vector3(0.12, 0.03, d * 0.7), Color("ffb066"), true), 0.9)
-
-
-func _wall_conduits() -> void:
-	var w := COLS * tile
-	var d := ROWS * tile
-	for sx in [-1.0, 1.0]:
-		for yy in [0.72, 0.5]:
-			var p := _cyl(self, Vector3(sx * (w / 2.0 - tile * 0.5), wall_h * yy, -d + 0.17), 0.05, tile * 0.9, Color("4a3a36"))
-			p.rotation_degrees.z = 90.0
-
-
-func _cables() -> void:
-	var w := COLS * tile
-	var d := ROWS * tile
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 11
-	for sx in [-1.0, 1.0]:
-		for k in 7:
-			var h := rng.randf_range(0.5, 1.3)
-			var cx: float = sx * (w / 2.0 - rng.randf_range(0.2, 0.6))
-			var cz := -d * rng.randf_range(0.55, 0.9)
-			var col := Color("15161b") if k % 3 != 0 else TRIM.darkened(0.4)
-			_cyl(self, Vector3(cx, wall_h - h / 2.0, cz), 0.018, h, col)
-
-
-## Blinking rack lights, solar-flare sun, and dust clouds rolling in.
-func _extras(delta: float) -> void:
-	_rack_timer -= delta
-	if _rack_timer <= 0.0 and not _rack_leds.is_empty():
-		_rack_timer = 0.12
-		for i in 4:
-			var led: MeshInstance3D = _rack_leds[randi() % _rack_leds.size()]
-			var m := led.material_override as StandardMaterial3D
-			var base: Color = led.get_meta("base")
-			var on := randf() > 0.35
-			m.emission_energy_multiplier = 1.6 if on else 0.05
-			m.albedo_color = base if on else base.darkened(0.7)
-	var target := 0.0
-	if storm_type == "SOLAR FLARE":
-		if storm_phase == 2:
-			target = 1.0
-		elif storm_phase == 1:
-			target = 0.35
-	_flare_amt = move_toward(_flare_amt, target, delta * 0.25)
-	var t := Time.get_ticks_msec() / 1000.0
-	if _flare_root != null:
-		_flare_root.visible = _flare_amt > 0.02
-		_flare_root.scale = Vector3.ONE * (0.4 + _flare_amt * (0.9 + 0.1 * sin(t * 6.0)))
-		_flare_root.rotation_degrees.z = t * 6.0
-	if _sun_core != null:
-		(_sun_core.material_override as StandardMaterial3D).albedo_color = Color("fff0a8").lerp(Color("ff7a2a"), _flare_amt)
-	if _sun_halo != null:
-		(_sun_halo.material_override as StandardMaterial3D).albedo_color = Color(1.0, 0.8 - 0.3 * _flare_amt, 0.35 - 0.2 * _flare_amt, 0.25 + 0.3 * _flare_amt)
-		_sun_halo.scale = Vector3.ONE * (1.0 + 0.9 * _flare_amt)
-	if _sun_light != null:
-		_sun_light.light_color = SUN_COL.lerp(FLARE_COL, _flare_amt)
-		_sun_light.light_energy = SUN_ENERGY * (1.0 - 0.75 * _dust_amt) * (1.0 + 0.5 * _flare_amt)
-	for i in _clouds.size():
-		var c := _clouds[i]
-		var bp: Vector3 = c.get_meta("base_pos")
-		c.position = bp + Vector3(sin(t * 0.15 + i) * 0.8, 0.0, _dust_amt * tile * 1.4)
-		c.scale = Vector3(1.6, 0.8, 1.0) * (1.0 + 0.5 * _dust_amt)
-		(c.material_override as StandardMaterial3D).albedo_color.a = 0.28 + 0.4 * _dust_amt
 
 
 func _no_shadow(n: Node) -> void:
