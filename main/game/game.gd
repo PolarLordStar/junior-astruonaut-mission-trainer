@@ -1,14 +1,14 @@
 extends Node
-var preset_values = preload("res://main/libraries/preset_values.gd")
-var player_script = preload("res://main/game/player/player.gd")
+var preset_values = preload("res://main/libraries/preset_values.gd").new()
+var player_script = preload("res://main/game/player/player.gd").new()
+var save_script = preload("res://scripts/save_manager.gd").new()
 
-var day_number: int = 0
-var time
+var day_number: int = save_script.load_day()
 
 func setup() -> void:
 	# Resetting Values
 	day_number += 1
-	#player_script.health = preset_values.MAX_HEALTH
+	player_script.health = preset_values.MAX_HEALTH
 	# ...
 	
 	# Enabling Day-Dependent Components
