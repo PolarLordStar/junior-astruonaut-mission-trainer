@@ -3,6 +3,7 @@ var preset_values = preload("res://main/libraries/preset_values.gd")
 var player_script = preload("res://main/game/player/player.gd")
 
 var day_number: int = 0
+var time
 
 func setup() -> void:
 	# Resetting Values
@@ -25,6 +26,7 @@ func setup() -> void:
 func start() -> void:
 	# ...screen saying Day Number
 	setup()
+	# ...date randomises
 func _on_day_end() -> void:
 	# ...screen saying day number survived
 	pass
