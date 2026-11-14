@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://rr5iupct8kbn"]
+[gd_scene format=3 uid="uid://b6ccwafynjimy"]
 
 [ext_resource type="Script" uid="uid://c371vv6w5w05h" path="res://scripts/main_menu.gd" id="1_nlkkf"]
 [ext_resource type="Script" uid="uid://hu8x2kf84h8w" path="res://scripts/mars_background.gd" id="2_nlkkf"]
@@ -57,7 +57,7 @@ layout_mode = 2
 text = "Exit"
 script = ExtResource("6_0o4t1")
 
-[node name="MessageLabel" type="Label" parent="."]
+[node name="MessageLabel" type="Label" parent="." unique_id=663175491]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5

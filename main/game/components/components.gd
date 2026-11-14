@@ -30,5 +30,5 @@ func _process(delta: float) -> void:
 		# check events for current date through api
 			# get date using game_script.date
 			# if there is an event on this date
-				events["EVENT_NAME"] = preset_values.EVEN
+				events["EVENT_NAME_SEVERITY"] = preset_values.EVENT_DURATION
 	
