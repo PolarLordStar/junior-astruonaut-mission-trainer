@@ -9,6 +9,11 @@ const MAX_DAYS: int = 5
 const DAY_DURATION: int = 300 # seconds (5 minutes)
 const EVENT_DURATION: int = 60
 
+const MIN_EVENT_TIME: float = 0.0
+const MAX_EVENT_TIME: float = 300.0
+const MIN_TIME_GAP: float = 8.0
+
+
 # Radiation,Power, Oxygen, ToxicPerch, SolarPanels
 
 const MAX_RADIATION: int = 100
@@ -21,7 +26,6 @@ const MAX_TOXIC_PERCH: int = 100
 const TOXIC_PERCH: int = 0
 const MAX_SOLAR_PANELS: int = 6
 const SOLAR_PANELS: int = 6
-
 
 
 # COMPONENTS

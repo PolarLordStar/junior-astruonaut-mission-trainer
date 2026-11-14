@@ -1,11 +1,12 @@
 extends Node
 
 func _ready() -> void:
-	var date = await DonkiService.fetch_random_day()
-	print("e")
-	for event in date["events"]:
-			print(event["name"], " | severity ", event["severity"])
-	print("e")
+	pass
+	#var date = await DonkiService.fetch_random_day()
+	#print("e")
+	#for event in date["events"]:
+			#print(event["name"], " | severity ", event["severity"])
+	#print("e")
 	
 	
 	#var day = await DonkiService.fetch_random_day()

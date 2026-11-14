@@ -22,7 +22,7 @@ const STORMS := [
 
 ## Returns {"name": String, "severity": int}.
 ## Returns an empty Dictionary {} when no storm is allowed yet (day 1 and 2).
-static func generate(day: int) -> Dictionary:
+static func generate(day: int):
 	var allowed: Array = []
 
 	for storm in STORMS:
@@ -35,4 +35,4 @@ static func generate(day: int) -> Dictionary:
 		return {}
 
 	var chosen: Dictionary = allowed.pick_random()
-	return {"name": chosen["name"], "severity": chosen["severity"]}
+	return {chosen["name"]: chosen["severity"]}
