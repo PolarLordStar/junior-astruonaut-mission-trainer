@@ -75,8 +75,8 @@ func _blink() -> bool:
 	return sin(t * 6.0) > -0.3
 
 
-func _text(pos: Vector2, s: String, size: int, color: Color, align: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
-	draw_string(ThemeDB.fallback_font, pos, s, align, width, size, color)
+func _text(pos: Vector2, s: String, font_size: int, color: Color, align: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
+	draw_string(ThemeDB.fallback_font, pos, s, align, width, font_size, color)
 
 
 func _level_color(v: float) -> Color:

@@ -4,7 +4,7 @@ extends Button
 ## Continue / Restart / Options / Exit each extend this and only add what happens on click.
 ## Override _on_pressed() in the child script. Call message.emit("text") to show the little
 ## message under the buttons (the MainMenu script displays it).
-
+@warning_ignore("unused_signal")
 signal message(text: String)
 
 const FONT_PATH := "res://fonts/pixel.ttf"   # optional pixel font, same as the pause menu

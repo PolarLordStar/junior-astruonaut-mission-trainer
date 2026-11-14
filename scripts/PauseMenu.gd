@@ -121,8 +121,8 @@ func _gap(parent: Control, h: float) -> void:
 	parent.add_child(g)
 
 
-func _style_text(c: Control, size: int) -> void:
-	c.add_theme_font_size_override("font_size", size)
+func _style_text(c: Control, font_size: int) -> void:
+	c.add_theme_font_size_override("font_size", font_size)
 	c.add_theme_color_override("font_outline_color", Color("2b2b2b"))
 	c.add_theme_constant_override("outline_size", 3)
 	if _font != null:

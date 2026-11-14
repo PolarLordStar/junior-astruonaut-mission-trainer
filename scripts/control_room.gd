@@ -172,9 +172,8 @@ func _pause_menu() -> void:
 
 
 func _on_restart() -> void:
-	# TODO: restart behaviour (to be decided).
-	_menu.toast("Restart is not set up yet")
-
+	get_tree().paused = false
+	get_tree().reload_current_scene()	
 
 func _on_options() -> void:
 	# TODO: options screen (to be decided).
@@ -349,10 +348,11 @@ func _kit(model: String) -> Node3D:
 	var bb := _bounds(inst, Transform3D.IDENTITY)
 	var c := bb.get_center()
 	inst.position = Vector3(-c.x, -bb.position.y, -c.z)
-	var wrap := Node3D.new()
-	wrap.add_child(inst)
-	wrap.set_meta("size", bb.size)
-	return wrap
+	var holder := Node3D.new()
+	holder.add_child(inst)
+	holder.set_meta("size", bb.size)
+	return holder
+
 
 
 func _size(model: String) -> Vector3:
@@ -392,10 +392,10 @@ func _mat(color: Color, glow := false) -> StandardMaterial3D:
 	return s
 
 
-func _box(parent: Node3D, pos: Vector3, size: Vector3, color: Color, glow := false) -> MeshInstance3D:
+func _box(parent: Node3D, pos: Vector3, box_size: Vector3, color: Color, glow := false) -> MeshInstance3D:
 	var m := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
-	mesh.size = size
+	mesh.size = box_size
 	m.mesh = mesh
 	m.material_override = _mat(color, glow)
 	m.position = pos
@@ -556,10 +556,10 @@ func _glow_mat(color: Color) -> StandardMaterial3D:
 	return m
 
 
-func _flat(pos: Vector3, size: Vector3, color: Color) -> void:
+func _flat(pos: Vector3, flat_size: Vector3, color: Color) -> void:
 	var m := MeshInstance3D.new()
 	var bm := BoxMesh.new()
-	bm.size = size
+	bm.size = flat_size
 	m.mesh = bm
 	m.material_override = _glow_mat(color)
 	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
