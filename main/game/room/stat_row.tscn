@@ -43,7 +43,7 @@ theme_override_constants/separation = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 20
 text = "NAME"
 
 [node name="ValueLine" type="HBoxContainer" parent="Margin/Layout/Left"]
@@ -55,14 +55,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2902, 0.8706, 0.5020, 1)
 theme_override_font_sizes/font_size = 30
-text = "--"
+text = "--%"
 
 [node name="UnitLabel" type="Label" parent="Margin/Layout/Left/ValueLine"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "%"
 
 [node name="Bar" type="ProgressBar" parent="Margin/Layout/Left"]

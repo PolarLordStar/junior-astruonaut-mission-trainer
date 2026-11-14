@@ -43,11 +43,11 @@ var clock_s := 0.0
 @onready var _cells: Array[Node] = %PanelCells.get_children()
 
 
-## Red below 25 %, amber below 50 %, green otherwise.
+## Green at 70 % and above, amber (yellowish) 50-69 %, red below 50 %.
 static func level_color(v: float) -> Color:
-	if v < 25.0:
-		return RED
 	if v < 50.0:
+		return RED
+	if v < 70.0:
 		return AMBER
 	return GREEN
 

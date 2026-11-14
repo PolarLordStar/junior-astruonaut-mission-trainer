@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://crroo36paioj6"]
 
-[ext_resource type="Script" uid="uid://b4ngbwv8mlykv" path="res://main/game/room/scripts/control_room.gd" id="1_tp8po"]
+[ext_resource type="Script" uid="uid://bpf16xvl14xqd" path="res://main/game/room/scripts/control_room.gd" id="1_tp8po"]
 [ext_resource type="Script" uid="uid://12cc3ot3glwk" path="res://main/game/room/scripts/mission_clock.gd" id="2_2gxgr"]
 [ext_resource type="Script" uid="uid://iegh6w7ufl3m" path="res://main/game/room/scripts/storm_system.gd" id="3_lu73p"]
 [ext_resource type="Script" uid="uid://b8s31sqdu02n" path="res://main/game/room/scripts/power_sensor.gd" id="4_1ta5g"]

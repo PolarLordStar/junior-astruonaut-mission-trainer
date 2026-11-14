@@ -47,7 +47,9 @@ const GREEN := Color("4ade80")
 const RED := Color("ff5a4a")
 const DARK := Color("2d2e55")
 const LAV_DARK := Color("6b6ca4")
-const CAM_PITCH := -9.0    # how far the camera looks down (degrees)
+const CAM_PITCH := -11.0   # how far the camera looks down (degrees)
+const CAM_HEIGHT := 0.62   # camera height as a fraction of the room height (a bit higher = monitors sit lower, so the window stays visible)
+const MONITOR_SCALE := 1.4 # 1.0 = original monitor size. Bigger = easier to read, but covers more of the window
 const SHOW_MENU_ON_START := false
 
 # ---- data nodes: CHILD nodes of ControlRoom, found automatically by group (names/order do not matter) ----
@@ -702,9 +704,13 @@ func _desk() -> Dictionary:
 	rig.scale = Vector3.ONE * u
 	add_child(rig)
 	# three monitors, the outer two angled towards the player
-	_monitor(rig, _status_viewport, Vector3(-1.7, 0.62, -0.2), 16.0)          # left: life support
-	_monitor(rig, _env_viewport, Vector3(0.0, 0.62, -0.42), 0.0)              # middle: radiation / oxygen / perchlorate
-	_monitor(rig, _alerts_viewport, Vector3(1.7, 0.62, -0.2), -16.0)          # right: warnings only
+	# MONITOR_SCALE makes them bigger; the side ones move outward so they never overlap the middle one,
+	# and all three keep the same gap above the desk (their bottom edge stays put, they grow upward).
+	var mon_y := 0.145 + 0.475 * MONITOR_SCALE
+	var mon_side := 0.76 * MONITOR_SCALE * (1.0 + cos(deg_to_rad(16.0))) + 0.12
+	_monitor(rig, _status_viewport, Vector3(-mon_side, mon_y, -0.2), 16.0)    # left: life support
+	_monitor(rig, _env_viewport, Vector3(0.0, mon_y, -0.42), 0.0)             # middle: radiation / oxygen / perchlorate
+	_monitor(rig, _alerts_viewport, Vector3(mon_side, mon_y, -0.2), -16.0)    # right: warnings only
 	_box(rig, Vector3(0, 0.02, 0.45), Vector3(1.1, 0.04, 0.35), DARK)              # keyboard
 	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
 	_box(rig, Vector3(1.05, 0.035, 0.5), Vector3(0.1, 0.04, 0.16), Color("2b2d36"))  # mouse
@@ -737,13 +743,13 @@ func _desk() -> Dictionary:
 func _monitor(parent: Node3D, vp: SubViewport, pos: Vector3, yaw: float) -> void:
 	if vp == null:
 		return
-	var bezel := _box(parent, pos, Vector3(1.52, 0.95, 0.07), DARK)
+	var bezel := _box(parent, pos, Vector3(1.52 * MONITOR_SCALE, 0.95 * MONITOR_SCALE, 0.07), DARK)
 	bezel.rotation_degrees.y = yaw
-	var stand_h := pos.y - 0.475 + 0.04
+	var stand_h := pos.y - 0.475 * MONITOR_SCALE + 0.04
 	_box(parent, Vector3(pos.x, stand_h / 2.0, pos.z), Vector3(0.14, stand_h, 0.14), LAV_DARK)
 	var quad := MeshInstance3D.new()
 	var q := QuadMesh.new()
-	q.size = Vector2(1.4, 0.875)
+	q.size = Vector2(1.4, 0.875) * MONITOR_SCALE
 	quad.mesh = q
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -765,7 +771,7 @@ func _props(desk: Dictionary) -> void:
 func _camera(desk: Dictionary) -> void:
 	var u: float = float(desk["width"]) / 5.0
 	var dpos: Vector3 = desk["pos"]
-	cam.position = Vector3(dpos.x, wall_h * 0.55, minf(dpos.z + 2.6 * u, -tile * 0.3))
+	cam.position = Vector3(dpos.x, wall_h * CAM_HEIGHT, minf(dpos.z + 2.6 * u, -tile * 0.3))
 	cam.rotation_degrees = Vector3(CAM_PITCH, 0, 0)   # fov and "current" are set on the Camera3D node
 
 
