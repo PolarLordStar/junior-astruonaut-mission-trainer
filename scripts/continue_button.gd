@@ -2,7 +2,7 @@ class_name ContinueButton
 extends McButton
 ## "Continue": fades the screen to black, then loads the game.
 
-const GAME_SCENE := "res://main/game/room/control_room.tscn"
+const GAME_SCENE := "res://main/game/game.tscn"
 
 var _starting := false
 
