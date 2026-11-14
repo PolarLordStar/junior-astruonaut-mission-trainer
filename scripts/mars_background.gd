@@ -3,7 +3,7 @@ extends Control
 ## Animated Mars backdrop for the main menu: pulsing sun, hazy mesas, slowly scrolling dunes
 ## and a rover that drives across the screen every so often. All drawn in code, no image files.
 
-const PERIOD := 26.0         # seconds per rover pass (it drives ~80% of that, then a short pause)
+const PERIOD := 27.0         # seconds per rover pass (it drives ~80% of that, then a short pause)
 const ROVER_SIZE := 500.0    # the rover is (screen height / this) times its drawn size: smaller = bigger rover
 const SKY_TOP := Color(0.36, 0.16, 0.10)
 const SKY_LOW := Color(0.95, 0.62, 0.38)
