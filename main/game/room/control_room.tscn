@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://crroo36paioj6"]
+
+[ext_resource type="Script" uid="uid://b4ngbwv8mlykv" path="res://main/game/room/scripts/control_room.gd" id="1_tp8po"]
+[ext_resource type="Script" uid="uid://12cc3ot3glwk" path="res://main/game/room/scripts/mission_clock.gd" id="2_2gxgr"]
+[ext_resource type="Script" uid="uid://iegh6w7ufl3m" path="res://main/game/room/scripts/storm_system.gd" id="3_lu73p"]
+[ext_resource type="Script" uid="uid://b8s31sqdu02n" path="res://main/game/room/scripts/power_sensor.gd" id="4_1ta5g"]
+[ext_resource type="Script" uid="uid://eu8foc8ckgke" path="res://main/game/room/scripts/solar_panels_sensor.gd" id="5_d3p5v"]
+[ext_resource type="Script" uid="uid://xjnicu66nyoc" path="res://main/game/room/scripts/radiation_sensor.gd" id="6_ci8aj"]
+[ext_resource type="Script" uid="uid://bb5ra556lstcs" path="res://main/game/room/scripts/oxygen_sensor.gd" id="7_42s7c"]
+[ext_resource type="Script" uid="uid://ct3iq4et8vccg" path="res://main/game/room/scripts/perchlorate_sensor.gd" id="8_mfua0"]
+[ext_resource type="Script" uid="uid://bc5xo01vd6okk" path="res://scripts/ScreenUI.gd" id="9_63k4a"]
+[ext_resource type="PackedScene" path="res://main/game/room/environment_screen.tscn" id="10_bfyki"]
+[ext_resource type="PackedScene" path="res://main/game/room/warnings_screen.tscn" id="11_4dslu"]
+[ext_resource type="Shader" uid="uid://bbun788rmf4n6" path="res://shaders/vignette.gdshader" id="12_i4jdc"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="13_he2g7"]
+
+[sub_resource type="Environment" id="Environment_room"]
+background_mode = 1
+background_color = Color(0.0706, 0.051, 0.0706, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.6275, 0.498, 0.4706, 1)
+ambient_light_energy = 0.55
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.6
+fog_enabled = true
+fog_light_color = Color(0.7059, 0.4471, 0.2902, 1)
+fog_density = 0.012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
+shader = ExtResource("12_i4jdc")
+
+[node name="ControlRoom" type="Node3D" unique_id=1901615750]
+script = ExtResource("1_tp8po")
+
+[node name="MissionClock" type="Node" parent="." unique_id=2098729331]
+script = ExtResource("2_2gxgr")
+
+[node name="StormSystem" type="Node" parent="." unique_id=1777052188]
+script = ExtResource("3_lu73p")
+
+[node name="LifeSupportMonitor" type="Node" parent="." unique_id=1368721947]
+
+[node name="PowerSensor" type="Node" parent="LifeSupportMonitor" unique_id=715874144]
+script = ExtResource("4_1ta5g")
+
+[node name="SolarPanelsSensor" type="Node" parent="LifeSupportMonitor" unique_id=1484422014]
+script = ExtResource("5_d3p5v")
+
+[node name="EnviromentMonitor" type="Node" parent="." unique_id=984985856]
+
+[node name="RadiationSensor" type="Node" parent="EnviromentMonitor" unique_id=907507017]
+script = ExtResource("6_ci8aj")
+simulate = false
+
+[node name="OxygenSensor" type="Node" parent="EnviromentMonitor" unique_id=255481967]
+script = ExtResource("7_42s7c")
+simulate = false
+
+[node name="PerchlorateSensor" type="Node" parent="EnviromentMonitor" unique_id=655848402]
+script = ExtResource("8_mfua0")
+simulate = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=924425099]
+environment = SubResource("Environment_room")
+
+[node name="RoomLamp" type="OmniLight3D" parent="." unique_id=1784915252]
+unique_name_in_owner = true
+light_color = Color(1, 0.851, 0.6902, 1)
+light_energy = 0.7
+
+[node name="AlertLight" type="OmniLight3D" parent="." unique_id=799837714]
+unique_name_in_owner = true
+light_color = Color(1, 0.2314, 0.1647, 1)
+light_energy = 0.0
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1084658561]
+unique_name_in_owner = true
+light_color = Color(1, 0.6157, 0.3608, 1)
+shadow_enabled = true
+directional_shadow_mode = 0
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1217412293]
+unique_name_in_owner = true
+current = true
+
+[node name="StatusViewport" type="SubViewport" parent="." unique_id=1099402582]
+unique_name_in_owner = true
+size = Vector2i(640, 400)
+render_target_update_mode = 4
+
+[node name="StatusScreen" type="Control" parent="StatusViewport" unique_id=1403468009]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("9_63k4a")
+
+[node name="EnvironmentViewport" type="SubViewport" parent="." unique_id=159556445]
+unique_name_in_owner = true
+size = Vector2i(640, 400)
+render_target_update_mode = 4
+
+[node name="EnvironmentScreen" parent="EnvironmentViewport" unique_id=1717798320 instance=ExtResource("10_bfyki")]
+unique_name_in_owner = true
+
+[node name="AlertsViewport" type="SubViewport" parent="." unique_id=91216260]
+unique_name_in_owner = true
+size = Vector2i(640, 400)
+render_target_update_mode = 4
+
+[node name="AlertsScreen" parent="AlertsViewport" unique_id=1903000180 instance=ExtResource("11_4dslu")]
+unique_name_in_owner = true
+
+[node name="Vignette" type="CanvasLayer" parent="." unique_id=1835396342]
+
+[node name="Rect" type="ColorRect" parent="Vignette" unique_id=1226465982]
+material = SubResource("ShaderMaterial_vignette")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PauseMenu" parent="." unique_id=2144919856 instance=ExtResource("13_he2g7")]
+unique_name_in_owner = true
+
+[connection signal="main_menu_pressed" from="PauseMenu" to="." method="_on_main_menu"]
+[connection signal="options_pressed" from="PauseMenu" to="." method="_on_options"]
+[connection signal="restart_pressed" from="PauseMenu" to="." method="_on_restart"]

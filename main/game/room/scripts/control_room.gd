@@ -5,7 +5,15 @@ extends Node3D
 ## Monitor 1 ("status"):      power supply, solar panel durability (6 panels), oxygen supply   (screen_ui.gd)
 ## Monitor 2 ("environment"): radiation, oxygen, toxic perchlorate                              (environment_screen.gd)
 ## Monitor 3 ("alerts"):      ONLY active warnings, black screen when there are none           (warnings_screen.gd)
-## Esc opens the pause menu (see pause_menu.gd).
+## Esc opens the pause menu (see PauseMenu.gd).
+##
+## SCENE NODES: the lights (RoomLamp, AlertLight, Sun), the WorldEnvironment, the Camera3D, the
+## Vignette, the PauseMenu and the three monitor screens (StatusScreen, EnvironmentScreen,
+## AlertsScreen, each inside its own SubViewport) are real nodes in control_room.tscn: select them
+## in the editor to change colours, energy, shadows, fov, text and so on. This script only PLACES
+## them, because positions depend on the room size measured from the Kenney models. The walls,
+## floor, desk, window, scenery and set dressing are still built from code (they are loops over
+## the measured kit models, not single nodes).
 ##
 ## DATA: every stat is its own child node of ControlRoom (RadiationSensor, OxygenSensor,
 ## PerchlorateSensor, PowerSensor, SolarPanelsSensor, StormSystem, MissionClock).
@@ -25,7 +33,6 @@ const WIN_TO := 3          # ...and ends at this tile (inclusive)
 const HEIGHT_SCALE := 1.4  # taller room (1.0 = original kit height)
 const WALL_COL := Color("3a3c45")   # window frame / trims: dark gunmetal
 const TRIM := Color("d9651f")       # rusty orange accent
-const LIGHT_BASE := 0.7    # normal brightness of the main lamp
 # ---- Mars-mission "worn industrial" look (tweak these to taste) ----
 const WALL_TINT := Color(0.6, 0.5, 0.45)    # multiplied onto the Kenney wall texture
 const FLOOR_TINT := Color(0.4, 0.35, 0.34)
@@ -33,11 +40,9 @@ const CEIL_TINT := Color(0.72, 0.4, 0.34)   # reddish ceiling panels
 const PROP_TINT := Color(0.55, 0.5, 0.48)
 const DESK_TINT := Color(0.38, 0.38, 0.42)
 const HULL := Color("23242b")
-const AMBIENT_ENERGY := 0.55   # raise if the room feels too dark
-const SUN_ENERGY := 1.0
-const SUN_COL := Color("ff9d5c")
+# Lamp / sun / ambient light settings now live on the RoomLamp, Sun and WorldEnvironment nodes
+# (Inspector). Their starting energy and colour are read from there when the scene starts.
 const FLARE_COL := Color("ff4d1f")
-const SHOW_SUN_SHADOWS := true  # window light shafts; set false if it looks glitchy or runs slowly
 const GREEN := Color("4ade80")
 const RED := Color("ff5a4a")
 const DARK := Color("2d2e55")
@@ -72,19 +77,28 @@ var _dust_amt: float:
 
 var tile := 2.0
 var wall_h := 2.0
-var cam: Camera3D
+@onready var cam: Camera3D = %Camera3D
 var _steam: Array[MeshInstance3D] = []
-var _light: OmniLight3D
-var _alert_light: OmniLight3D
+@onready var _light: OmniLight3D = %RoomLamp          # the warm lamp that flickers
+@onready var _alert_light: OmniLight3D = %AlertLight   # red, pulses on warnings
+@onready var _sun_light: DirectionalLight3D = %Sun
+var _light_base := 1.0        # starting values, read from the nodes above in _ready()
+var _sun_base_energy := 1.0
+var _sun_base_color := Color.WHITE
 var _haze_mat: ShaderMaterial
 var _led_green: MeshInstance3D
 var _led_red: MeshInstance3D
-var _screens := {}
-var _menu: PauseMenu
+# The monitors are optional: delete a viewport (and its screen) from control_room.tscn to remove one.
+@onready var _status_viewport := get_node_or_null("%StatusViewport") as SubViewport
+@onready var _env_viewport := get_node_or_null("%EnvironmentViewport") as SubViewport
+@onready var _alerts_viewport := get_node_or_null("%AlertsViewport") as SubViewport
+@onready var _status_screen := get_node_or_null("%StatusScreen") as ScreenUI
+@onready var _env_screen := get_node_or_null("%EnvironmentScreen") as EnvironmentScreen
+@onready var _alerts_screen := get_node_or_null("%AlertsScreen") as WarningsScreen
+@onready var _menu: PauseMenu = %PauseMenu
 var _flicker := 0.0
 var _shake := 0.0
 var _shake_off := Vector2.ZERO
-var _sun_light: DirectionalLight3D
 var _sun_core: MeshInstance3D
 var _sun_halo: MeshInstance3D
 var _flare_root: Node3D
@@ -108,6 +122,9 @@ func _ready() -> void:
 	var ws := _size("wall")
 	if ws != Vector3.ZERO:
 		wall_h = ws.y * HEIGHT_SCALE
+	_light_base = _light.light_energy
+	_sun_base_energy = _sun_light.light_energy
+	_sun_base_color = _sun_light.light_color
 	_lighting()
 	_shell(fs.y)
 	_big_window()
@@ -116,8 +133,8 @@ func _ready() -> void:
 	_camera(desk)
 	_props(desk)
 	_decor()
-	_vignette()
-	_pause_menu()
+	if SHOW_MENU_ON_START:
+		_menu.open()
 
 
 func _process(delta: float) -> void:
@@ -160,16 +177,7 @@ func _val(id: String) -> float:
 
 
 # ---------- pause menu ----------
-func _pause_menu() -> void:
-	_menu = PauseMenu.new()
-	add_child(_menu)
-	_menu.restart_pressed.connect(_on_restart)
-	_menu.options_pressed.connect(_on_options)
-	_menu.main_menu_pressed.connect(_on_main_menu)
-	if SHOW_MENU_ON_START:
-		_menu.open()
-
-
+# The PauseMenu node is in control_room.tscn; its three signals are connected to these there.
 func _on_restart() -> void:
 	# TODO: restart behaviour (to be decided).
 	_menu.toast("Restart is not set up yet")
@@ -225,7 +233,7 @@ func _set_led(led: MeshInstance3D, on: bool) -> void:
 
 
 func _push_screens() -> void:
-	var st: ScreenUI = _screens.get("status")
+	var st := _status_screen
 	if st != null:
 		st.power = _val("power")
 		st.oxygen = _val("oxygen")
@@ -235,13 +243,13 @@ func _push_screens() -> void:
 		if clock != null:
 			st.sol = clock.sol
 			st.clock_s = clock.clock_s
-	var env: EnvironmentScreen = _screens.get("environment")
+	var env := _env_screen
 	if env != null:
 		for id in env.rows.keys():
 			env.set_value(id, _val(id))
 		if clock != null:
 			env.set_time(clock.sol, clock.clock_s)
-	var al: WarningsScreen = _screens.get("alerts")
+	var al := _alerts_screen
 	if al != null:
 		al.set_warnings(_warnings)
 
@@ -286,29 +294,10 @@ func _flicker_light(delta: float) -> void:
 	var chance := 0.004 + (0.012 * storm_level if storm_phase == 2 else 0.0)
 	if randf() < chance:
 		_flicker = 0.25
-	_light.light_energy = (LIGHT_BASE - _flicker) * (1.0 - 0.3 * _dust_amt)
+	_light.light_energy = (_light_base - _flicker) * (1.0 - 0.3 * _dust_amt)
 
 
 # ---------- polish ----------
-func _vignette() -> void:
-	var layer := CanvasLayer.new()
-	var rect := ColorRect.new()
-	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sh := Shader.new()
-	sh.code = """shader_type canvas_item;
-void fragment() {
-    float v = smoothstep(0.35, 0.85, length(UV - 0.5));
-    COLOR = vec4(0.04, 0.03, 0.1, v * 0.55);
-}
-"""
-	var m := ShaderMaterial.new()
-	m.shader = sh
-	rect.material = m
-	layer.add_child(rect)
-	add_child(layer)
-
-
 func _pipe(x: float, z: float) -> void:
 	var ps := _size("pipe")
 	var p := _place("pipe", Vector3(x, 0, z), 0.0, false, PROP_TINT)
@@ -399,47 +388,16 @@ func _box(parent: Node3D, pos: Vector3, size: Vector3, color: Color, glow := fal
 
 
 # ---------- scene parts ----------
+## The environment and the three lights are nodes in control_room.tscn (WorldEnvironment, RoomLamp,
+## AlertLight, Sun). Colours, energy and shadows are edited there. This only places them and sets
+## the ranges, because those depend on the room size measured from the kit models.
 func _lighting() -> void:
-	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("120d12")
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("a07f78")
-	env.ambient_light_energy = AMBIENT_ENERGY
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.glow_enabled = true
-	env.glow_intensity = 0.6
-	env.fog_enabled = true
-	env.fog_light_color = Color("b4724a")
-	env.fog_density = 0.012
-	var we := WorldEnvironment.new()
-	we.environment = env
-	add_child(we)
-	# dim warm room lamp (this is the one that flickers)
-	var light := OmniLight3D.new()
-	light.position = Vector3(0, wall_h * 0.5, -tile * ROWS * 0.5)
-	light.light_energy = LIGHT_BASE
-	light.omni_range = tile * COLS * 1.6
-	light.light_color = Color("ffd9b0")
-	add_child(light)
-	_light = light
-	# red alarm light (pulses on warnings)
-	_alert_light = OmniLight3D.new()
+	var light_range := tile * COLS * 1.6
+	_light.position = Vector3(0, wall_h * 0.5, -tile * ROWS * 0.5)
+	_light.omni_range = light_range
 	_alert_light.position = Vector3(0, wall_h * 0.6, -tile * ROWS * 0.6)
-	_alert_light.light_color = Color("ff3b2a")
-	_alert_light.light_energy = 0.0
-	_alert_light.omni_range = tile * COLS * 1.6
-	add_child(_alert_light)
-	# the Martian sun, shining in through the big window
-	_sun_light = DirectionalLight3D.new()
-	_sun_light.light_color = SUN_COL
-	_sun_light.light_energy = SUN_ENERGY
-	_sun_light.shadow_enabled = SHOW_SUN_SHADOWS
-	_sun_light.shadow_bias = 0.1
-	_sun_light.shadow_normal_bias = 2.0
-	_sun_light.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+	_alert_light.omni_range = light_range
 	_sun_light.directional_shadow_max_distance = tile * ROWS * 1.6
-	add_child(_sun_light)
 	_sun_light.look_at_from_position(Vector3(1.5, wall_h * 1.3, -tile * ROWS - tile * 4.0), Vector3(0, 0, -tile * ROWS * 0.45))
 
 
@@ -744,9 +702,9 @@ func _desk() -> Dictionary:
 	rig.scale = Vector3.ONE * u
 	add_child(rig)
 	# three monitors, the outer two angled towards the player
-	_monitor(rig, "status", Vector3(-1.7, 0.62, -0.2), 16.0)          # left: life support (unchanged)
-	_monitor(rig, "environment", Vector3(0.0, 0.62, -0.42), 0.0)      # middle: radiation / oxygen / perchlorate
-	_monitor(rig, "alerts", Vector3(1.7, 0.62, -0.2), -16.0)          # right: warnings only
+	_monitor(rig, _status_viewport, Vector3(-1.7, 0.62, -0.2), 16.0)          # left: life support
+	_monitor(rig, _env_viewport, Vector3(0.0, 0.62, -0.42), 0.0)              # middle: radiation / oxygen / perchlorate
+	_monitor(rig, _alerts_viewport, Vector3(1.7, 0.62, -0.2), -16.0)          # right: warnings only
 	_box(rig, Vector3(0, 0.02, 0.45), Vector3(1.1, 0.04, 0.35), DARK)              # keyboard
 	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
 	_box(rig, Vector3(1.05, 0.035, 0.5), Vector3(0.1, 0.04, 0.16), Color("2b2d36"))  # mouse
@@ -774,28 +732,15 @@ func _desk() -> Dictionary:
 	return {"pos": pos, "top": top, "width": width}
 
 
-func _monitor(parent: Node3D, kind: String, pos: Vector3, yaw: float) -> void:
+## One desk monitor: bezel, stand and a quad that shows the SubViewport's picture. The screen
+## itself (the SubViewport and the UI inside it) is a node in control_room.tscn.
+func _monitor(parent: Node3D, vp: SubViewport, pos: Vector3, yaw: float) -> void:
+	if vp == null:
+		return
 	var bezel := _box(parent, pos, Vector3(1.52, 0.95, 0.07), DARK)
 	bezel.rotation_degrees.y = yaw
 	var stand_h := pos.y - 0.475 + 0.04
 	_box(parent, Vector3(pos.x, stand_h / 2.0, pos.z), Vector3(0.14, stand_h, 0.14), LAV_DARK)
-	var vp := SubViewport.new()
-	vp.size = Vector2i(int(ScreenUI.W), int(ScreenUI.H))
-	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	add_child(vp)
-	var ui: Control
-	match kind:
-		"environment":
-			ui = EnvironmentScreen.new()
-		"alerts":
-			ui = WarningsScreen.new()
-		_:
-			var status_ui := ScreenUI.new()
-			status_ui.mode = kind
-			ui = status_ui
-	ui.name = "Screen_" + kind
-	vp.add_child(ui)
-	_screens[kind] = ui
 	var quad := MeshInstance3D.new()
 	var q := QuadMesh.new()
 	q.size = Vector2(1.4, 0.875)
@@ -820,12 +765,8 @@ func _props(desk: Dictionary) -> void:
 func _camera(desk: Dictionary) -> void:
 	var u: float = float(desk["width"]) / 5.0
 	var dpos: Vector3 = desk["pos"]
-	cam = Camera3D.new()
 	cam.position = Vector3(dpos.x, wall_h * 0.55, minf(dpos.z + 2.6 * u, -tile * 0.3))
-	cam.rotation_degrees = Vector3(CAM_PITCH, 0, 0)
-	cam.fov = 75
-	add_child(cam)
-	cam.current = true
+	cam.rotation_degrees = Vector3(CAM_PITCH, 0, 0)   # fov and "current" are set on the Camera3D node
 
 
 ## Multiplies a colour onto every material of a kit model (used to darken the pastel Kenney look).
@@ -1080,8 +1021,8 @@ func _extras(delta: float) -> void:
 		(_sun_halo.material_override as StandardMaterial3D).albedo_color = Color(1.0, 0.8 - 0.3 * _flare_amt, 0.35 - 0.2 * _flare_amt, 0.25 + 0.3 * _flare_amt)
 		_sun_halo.scale = Vector3.ONE * (1.0 + 0.9 * _flare_amt)
 	if _sun_light != null:
-		_sun_light.light_color = SUN_COL.lerp(FLARE_COL, _flare_amt)
-		_sun_light.light_energy = SUN_ENERGY * (1.0 - 0.75 * _dust_amt) * (1.0 + 0.5 * _flare_amt)
+		_sun_light.light_color = _sun_base_color.lerp(FLARE_COL, _flare_amt)
+		_sun_light.light_energy = _sun_base_energy * (1.0 - 0.75 * _dust_amt) * (1.0 + 0.5 * _flare_amt)
 	for i in _clouds.size():
 		var c := _clouds[i]
 		var bp: Vector3 = c.get_meta("base_pos")
