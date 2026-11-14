@@ -15,8 +15,12 @@ extends Control
 ##   │   ├ Header (HBox): TitleLabel, ClockLabel
 ##   │   ├ PowerMeter   (StatusMeter instance, room/status_meter.tscn)
 ##   │   ├ OxygenMeter  (StatusMeter instance)
-##   │   ├ PanelsHeader (HBox): PanelsTitle, PanelsAvgLabel
-##   │   └ PanelCells (HBox): Panel1 ... Panel6 (SolarPanelCell instances, room/solar_panel_cell.tscn)
+##   │   ├ PanelsHeader (HBox): PanelsTitle
+##   │   └ PanelsRow (HBox)
+##   │     ├ GridBox (PanelContainer, the frame around the grid)
+##   │     │ └ PanelCells (GridContainer, 3 columns x 2 rows): Panel1 ... Panel6 (SolarPanelCell instances,
+##   │     │               room/solar_panel_cell.tscn; Panel1-3 are the top row, Panel4-6 the bottom row)
+##   │     └ CountCircle (Panel drawn as a circle): CountLabel   <- the number of working panels, 0-6
 ##   └ Frame (Panel, the blue border)
 
 # Shared colours and thresholds (also used by StatusMeter and SolarPanelCell).
@@ -32,18 +36,22 @@ const RED := Color("ff5a4a")
 # Values pushed in by control_room.gd every frame.
 var power := 100.0
 var oxygen := 100.0
-var panels: Array[float] = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+var panels: Array[bool] = [true, true, true, true, true, true]   # true = that solar panel works
 var sol := 1
 var clock_s := 0.0
 
 @onready var clock_label: Label = %ClockLabel
 @onready var power_meter: StatusMeter = %PowerMeter
 @onready var oxygen_meter: StatusMeter = %OxygenMeter
-@onready var panels_avg_label: Label = %PanelsAvgLabel
+@onready var count_circle: Panel = %CountCircle
+@onready var count_label: Label = %CountLabel
 @onready var _cells: Array[Node] = %PanelCells.get_children()
 
+# "Local to Scene" in the .tscn, so the circle has its own copy to recolour.
+@onready var _circle_style := count_circle.get_theme_stylebox("panel") as StyleBoxFlat
 
-## Green at 70 % and above, amber (yellowish) 50-69 %, red below 50 %.
+
+## Green at 70 % and above, amber (yellowish) 50-69 %, red below 50 %. (Power and oxygen bars.)
 static func level_color(v: float) -> Color:
 	if v < 50.0:
 		return RED
@@ -52,16 +60,24 @@ static func level_color(v: float) -> Color:
 	return GREEN
 
 
+## Colour of the "number of working solar panels" circle: 0-2 red, 3-4 amber (yellowish), 5-6 green.
+static func count_color(working: int) -> Color:
+	if working <= 2:
+		return RED
+	if working <= 4:
+		return AMBER
+	return GREEN
+
+
 func _process(_delta: float) -> void:
 	clock_label.text = "SOL %03d · %02d:%02d" % [sol, int(clock_s / 3600.0), int(fmod(clock_s, 3600.0) / 60.0)]
 	power_meter.set_value(power)
 	oxygen_meter.set_value(oxygen)
-	var avg := 0.0
+	var working := 0
 	for i in _cells.size():
-		var v: float = panels[i] if i < panels.size() else 0.0
-		(_cells[i] as SolarPanelCell).set_value(v)
-	for p in panels:
-		avg += p
-	avg /= maxf(1.0, float(panels.size()))
-	panels_avg_label.text = "AVG %d%%" % roundi(avg)
-	panels_avg_label.add_theme_color_override("font_color", level_color(avg))
+		var ok: bool = panels[i] if i < panels.size() else false
+		(_cells[i] as SolarPanelCell).set_working(ok)
+		if ok:
+			working += 1
+	count_label.text = str(working)
+	_circle_style.bg_color = count_color(working)

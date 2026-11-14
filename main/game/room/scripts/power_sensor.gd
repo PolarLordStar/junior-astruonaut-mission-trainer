@@ -47,7 +47,8 @@ func _simulate(delta: float) -> void:
 	if _tick >= 0.25:
 		_tick = 0.0
 		_noise = randf_range(-1.2, 1.2)
-	var avg := _panels.value if _panels != null else 90.0
+	# the panels report how many of the 6 work (0-6); turn that into 0-100 for the power maths
+	var avg := (_panels.value / maxf(_panels.max_value, 0.01) * 100.0) if _panels != null else 90.0
 	var dust := _storm.dust_amt if _storm != null else 0.0
 	var sun := 1.0 - 0.55 * clampf(dust, 0.0, 1.0)
 	_base = move_toward(_base, (avg * 0.9 + 10.0) * sun, delta * 4.0)
