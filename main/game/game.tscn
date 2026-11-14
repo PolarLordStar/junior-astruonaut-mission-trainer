@@ -11,6 +11,9 @@ script = ExtResource("1_3epdo")
 [node name="DayTimer" type="Timer" parent="Timers" unique_id=1035871489]
 one_shot = true
 
+[node name="TickUpdateTimer" type="Timer" parent="Timers" unique_id=1591023496]
+
 [node name="ControlRoom" parent="." unique_id=1901615750 instance=ExtResource("2_5mlo5")]
 
 [connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
+[connection signal="timeout" from="Timers/TickUpdateTimer" to="." method="_updating_tick"]

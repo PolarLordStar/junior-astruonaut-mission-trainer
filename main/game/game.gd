@@ -9,7 +9,7 @@ var date
 
 func setup() -> void:
 	# Resetting Values
-	day_number += 4
+	day_number += 1
 	date = await DonkiService.fetch_random_day()
 	
 	# Resetting Components
@@ -28,20 +28,22 @@ func setup() -> void:
 	# Other
 	$Timers/DayTimer.wait_time = preset_values.new().DAY_DURATION
 	$Timers/DayTimer.start()
+	$Timers/TickUpdateTimer.start()
 
 
 # START OR NEXT DAY FUNCTIONS
 func start() -> void:
 	# ...screen saying Day Number
 	setup()
-	# ...date randomises
 func _on_day_end() -> void:
+	$Timers/DayTimer.stop()
+	$Timers/TickUpdateTimer.stop()
 	# ...screen saying day number survived
-	pass
 func _ready() -> void:
 	start()
 
 
+# EVENTS
 func start_event_timers() -> void:
 	# Clear any leftover event timers from the previous day
 	for child in $Timers.get_children():
@@ -86,3 +88,8 @@ func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> voi
 	
 	# Clean up the duration timer node
 	end_timer.queue_free()
+
+
+# COMPONENTS
+func _updating_tick() -> void:
+	components_script.tick_update()

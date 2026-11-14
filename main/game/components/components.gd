@@ -3,11 +3,10 @@ var preset_values = preload("res://main/libraries/preset_values.gd").new()
 
 # Variables for bars and stuff
 var Radiation = 0
-var Power = 100 # Placeholder value
-var Oxygen = 100 # Placeholder
+var Power = 0
+var Oxygen = 0
 var ToxicPerch = 0
-var SolarPanels = 100 # Placeholder
-var OccuringStorm = "None"
+var SolarPanels = 0
 
 # Events
 var events_for_today = {} # {event : severity}
@@ -67,4 +66,32 @@ func decide_events(date, day_number: int) -> void:
 		events_to_occur[event_key] = chosen_time
 	
 	print("Scheduled events: ", events_to_occur)
-	
+
+func tick_update() -> void:
+	pass
+	## 1. Baseline changes that happen every tick (even without events)
+	#Oxygen -= 0.5
+	#Power += (SolarPanels / 100.0) * 1.0
+	#
+	## 2. Apply effects from any active events in events_occurring
+	#for event_dict in events_occurring:
+		#var event_name: String = event_dict.keys()[0]
+		#var severity: int = event_dict[event_name]
+		#
+		#match event_name:
+			#"Solar Cloud Incoming":
+				#Radiation += 2.0 * severity
+				#SolarPanels -= 1.0 * severity
+			#"Toxic Storm":
+				#ToxicPerch += 1.5 * severity
+				#Oxygen -= 1.0 * severity
+			## Add more event names here as needed
+	#
+	## 3. Keep values within valid bounds
+	#Radiation = clampf(Radiation, 0.0, 100.0)
+	#Power = clampf(Power, 0.0, 100.0)
+	#Oxygen = clampf(Oxygen, 0.0, 100.0)
+	#ToxicPerch = clampf(ToxicPerch, 0.0, 100.0)
+	#SolarPanels = clampf(SolarPanels, 0.0, 100.0)
+	#
+	#print("Stats -> Rad: ", Radiation, " | Power: ", Power, " | O2: ", Oxygen)
