@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dp0nd32p4pjac"]
+
+[ext_resource type="Script" uid="uid://buikqrfnwyarc" path="res://main/game/game.gd" id="1_3epdo"]
+
+[node name="Game" type="Node" unique_id=466476844]
+script = ExtResource("1_3epdo")
+
+[node name="Timers" type="Node" parent="." unique_id=956759653]
+
+[node name="DayTimer" type="Timer" parent="Timers" unique_id=1035871489]
+one_shot = true
+
+[connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
