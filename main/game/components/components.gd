@@ -23,16 +23,3 @@ var OxygenEnabled = false
 var ToxicPerchEnabled = false
 var SolarPanEnabled = false
 var StormsEnabled = false
-
-
-func _ready() -> void:
-	if RadiationEnabled:
-		var day = await DonkiService.fetch_random_day()
-
-		print(day["date"])
-		print(day["message"])
-		for e in day["events"]:
-			print(e["name"], " | severity ", e["severity"], " | ", e["details"])
-
-		events["EVENT_NAME_SEVERITY"] = preset_values.EVENT_DURATION
-	
