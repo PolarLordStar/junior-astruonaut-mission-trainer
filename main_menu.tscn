@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://b6ccwafynjimy"]
+[gd_scene format=3 uid="uid://rr5iupct8kbn"]
 
-[ext_resource type="Script" uid="uid://cngifc7uegsew" path="res://scripts/main_menu.gd" id="1_nlkkf"]
+[ext_resource type="Script" uid="uid://c371vv6w5w05h" path="res://scripts/main_menu.gd" id="1_nlkkf"]
 [ext_resource type="Script" uid="uid://hu8x2kf84h8w" path="res://scripts/mars_background.gd" id="2_nlkkf"]
 [ext_resource type="Script" uid="uid://u7q5xeklb1cw" path="res://scripts/continue_button.gd" id="3_qe12f"]
 [ext_resource type="Script" uid="uid://xq51b2hwyyxm" path="res://scripts/restart_button.gd" id="4_8qtwp"]
@@ -56,3 +56,18 @@ script = ExtResource("5_dy7ct")
 layout_mode = 2
 text = "Exit"
 script = ExtResource("6_0o4t1")
+
+[node name="MessageLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -110.0
+offset_right = 300.0
+offset_bottom = -87.0
+grow_horizontal = 2
+grow_vertical = 0
+horizontal_alignment = 1
