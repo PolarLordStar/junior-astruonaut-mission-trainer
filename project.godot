@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Junior Astruonaut Mission Trainer"
-run/main_scene="uid://rr5iupct8kbn"
+run/main_scene="uid://b6ccwafynjimy"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

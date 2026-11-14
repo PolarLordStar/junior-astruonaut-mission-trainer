@@ -8,7 +8,7 @@ var time
 func setup() -> void:
 	# Resetting Values
 	day_number += 1
-	player_script.health = preset_values.MAX_HEALTH
+	#player_script.health = preset_values.MAX_HEALTH
 	# ...
 	
 	# Enabling Day-Dependent Components
