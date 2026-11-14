@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://crroo36paioj6"]
 
-[ext_resource type="Script" uid="uid://b4ngbwv8mlykv" path="res://scripts/control_room.gd" id="1_0vfs3"]
-[ext_resource type="Script" uid="uid://12cc3ot3glwk" path="res://scripts/mission_clock.gd" id="2_cy6uy"]
-[ext_resource type="Script" uid="uid://iegh6w7ufl3m" path="res://scripts/storm_system.gd" id="3_gx7b4"]
-[ext_resource type="Script" uid="uid://b8s31sqdu02n" path="res://scripts/power_sensor.gd" id="4_sto5t"]
-[ext_resource type="Script" uid="uid://eu8foc8ckgke" path="res://scripts/solar_panels_sensor.gd" id="5_c6xk0"]
-[ext_resource type="Script" uid="uid://xjnicu66nyoc" path="res://scripts/radiation_sensor.gd" id="6_ubtns"]
-[ext_resource type="Script" uid="uid://bb5ra556lstcs" path="res://scripts/oxygen_sensor.gd" id="7_55f6q"]
-[ext_resource type="Script" uid="uid://ct3iq4et8vccg" path="res://scripts/perchlorate_sensor.gd" id="8_flckv"]
+[ext_resource type="Script" uid="uid://b4ngbwv8mlykv" path="res://scripts/scripts/control_room.gd" id="1_0vfs3"]
+[ext_resource type="Script" uid="uid://12cc3ot3glwk" path="res://scripts/scripts/mission_clock.gd" id="2_cy6uy"]
+[ext_resource type="Script" uid="uid://iegh6w7ufl3m" path="res://scripts/scripts/storm_system.gd" id="3_gx7b4"]
+[ext_resource type="Script" uid="uid://b8s31sqdu02n" path="res://scripts/scripts/power_sensor.gd" id="4_sto5t"]
+[ext_resource type="Script" uid="uid://eu8foc8ckgke" path="res://scripts/scripts/solar_panels_sensor.gd" id="5_c6xk0"]
+[ext_resource type="Script" uid="uid://xjnicu66nyoc" path="res://scripts/scripts/radiation_sensor.gd" id="6_ubtns"]
+[ext_resource type="Script" uid="uid://bb5ra556lstcs" path="res://scripts/scripts/oxygen_sensor.gd" id="7_55f6q"]
+[ext_resource type="Script" uid="uid://ct3iq4et8vccg" path="res://scripts/scripts/perchlorate_sensor.gd" id="8_flckv"]
 
 [node name="ControlRoom" type="Node3D" unique_id=1901615750]
 script = ExtResource("1_0vfs3")
