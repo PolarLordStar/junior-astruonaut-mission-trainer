@@ -1,8 +1,27 @@
 class_name RestartButton
 extends McButton
 ## "Restart": not set up yet.
+var save_script = preload("res://scripts/save_manager.gd")
+const GAME_SCENE := "res://main/game/game.tscn"
+
+var _starting := false
 
 
 func _on_pressed() -> void:
-	# TODO: restart behaviour (to be decided).
-	message.emit("Restart is not set up yet")
+	if _starting:
+		return
+	if not ResourceLoader.exists(GAME_SCENE):
+		message.emit("Game scene not found: " + GAME_SCENE)
+		return
+	_starting = true
+	save_script.new().delete_save()
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	var fade := ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(fade)
+	add_child(layer)
+	var tw := create_tween()
+	tw.tween_property(fade, "color:a", 1.0, 0.5)
+	tw.tween_callback(func(): get_tree().change_scene_to_file(GAME_SCENE))
