@@ -30,9 +30,12 @@ script = ExtResource("5_gx7b4")
 
 [node name="RadiationSensor" type="Node" parent="EnviromentMonitor" unique_id=907507017]
 script = ExtResource("6_0vfs3")
+simulate = false
 
 [node name="OxygenSensor" type="Node" parent="EnviromentMonitor" unique_id=255481967]
 script = ExtResource("7_cy6uy")
+simulate = false
 
 [node name="PerchlorateSensor" type="Node" parent="EnviromentMonitor" unique_id=655848402]
 script = ExtResource("8_gx7b4")
+simulate = false
