@@ -15,6 +15,11 @@ run/main_scene="uid://b6ccwafynjimy"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+DonkiService="*uid://dwisqfchmrjxw"
+Test123="*uid://dmma712lr4p3v"
+
 [display]
 
 window/stretch/mode="canvas_items"
