@@ -12,9 +12,9 @@ const UNIT := "%"
 const DECIMALS := 0
 const MIN := 0.0
 const MAX := 100.0
-const WARN := 45.0        # amber BELOW this (low is bad)
-const DANGER := 30.0      # red BELOW this
-const START := 70.0
+const WARN := 70.0        # amber BELOW this (low is bad)
+const DANGER := 50.0      # red BELOW this
+const START := 90.0
 const O2_DRAIN := 0.4     # % used per second (simulation)
 # ================================================================
 
