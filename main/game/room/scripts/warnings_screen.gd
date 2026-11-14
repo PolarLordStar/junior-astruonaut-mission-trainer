@@ -24,7 +24,7 @@ extends Control
 ##     │   └ Cards (VBox): Warning_<id> ...  (WarningCard instances)
 ##     └ Frame (Panel, the blue border)
 
-const MAX_VISIBLE := 4
+const MAX_VISIBLE := 3
 const WARNING_CARD := preload("res://scenes/warning_card.tscn")
 
 @onready var title_label: Label = %TitleLabel
