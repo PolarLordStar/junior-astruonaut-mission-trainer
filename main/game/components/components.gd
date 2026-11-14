@@ -25,10 +25,14 @@ var SolarPanEnabled = false
 var StormsEnabled = false
 
 
-func _process(delta: float) -> void:
+func _ready() -> void:
 	if RadiationEnabled:
-		# check events for current date through api
-			# get date using game_script.date
-			# if there is an event on this date
-				events["EVENT_NAME_SEVERITY"] = preset_values.EVENT_DURATION
+		var day = await DonkiService.fetch_random_day()
+
+		print(day["date"])
+		print(day["message"])
+		for e in day["events"]:
+			print(e["name"], " | severity ", e["severity"], " | ", e["details"])
+
+		events["EVENT_NAME_SEVERITY"] = preset_values.EVENT_DURATION
 	
