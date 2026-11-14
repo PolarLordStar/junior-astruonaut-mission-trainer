@@ -112,6 +112,8 @@ var _grunge_cache := {}
 var _warnings: Array = []     # active warnings, rebuilt every frame (shown on monitor 3)
 var window_bars: Array[MeshInstance3D] = []   # the 2 bars between the window panes: window_bars[0].hide() removes one
 var _bars_root: Node3D
+var _action_buttons: Array[ActionButton] = []   # the 3 push-buttons on the desk
+var _hovered: ActionButton                      # the button the mouse is over right now (or null)
 
 
 func _ready() -> void:
@@ -157,6 +159,7 @@ func _process(delta: float) -> void:
 	cam.rotation_degrees.y = lerpf(cam.rotation_degrees.y, -(m.x - 0.5) * 50.0, 0.1)
 	cam.rotation_degrees.x = CAM_PITCH + _shake_off.x
 	cam.rotation_degrees.z = _shake_off.y
+	_set_hovered(_button_under_mouse())
 
 
 # ---------- data nodes ----------
@@ -193,6 +196,62 @@ func _on_options() -> void:
 func _on_main_menu() -> void:
 	get_tree().paused = false   # the pause menu paused the tree; undo it first
 	get_tree().change_scene_to_file("res://main_menu.tscn")
+
+
+# ---------- desk buttons ----------
+## Left-click on one of the three desk buttons presses it.
+func _unhandled_input(event: InputEvent) -> void:
+	var click := event as InputEventMouseButton
+	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+		var b := _button_under_mouse()
+		if b != null:
+			b.press()
+			get_viewport().set_input_as_handled()
+
+
+func _button_under_mouse() -> ActionButton:
+	var mp := get_viewport().get_mouse_position()
+	var origin := cam.project_ray_origin(mp)
+	var dir := cam.project_ray_normal(mp)
+	for b in _action_buttons:
+		if b.ray_hits(origin, dir):
+			return b
+	return null
+
+
+func _set_hovered(b: ActionButton) -> void:
+	if b == _hovered:
+		return
+	if _hovered != null:
+		_hovered.set_hover(false)
+	_hovered = b
+	if b != null:
+		b.set_hover(true)
+	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND if b != null else Input.CURSOR_ARROW)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PAUSED:   # pause menu opened: drop the hover and the hand cursor
+		_set_hovered(null)
+
+
+func _exit_tree() -> void:
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+
+
+# ---------- player actions ----------
+# Each desk button calls ONE of these when it is clicked. They are EMPTY on purpose:
+# put your code inside them (GDScript needs "pass" in an empty function, delete it when you add code).
+func radiation_shielding() -> void:
+	pass
+
+
+func air_filtering() -> void:
+	pass
+
+
+func covering_solar_panels() -> void:
+	pass
 
 
 # ---------- storm visuals ----------
@@ -715,7 +774,8 @@ func _desk() -> Dictionary:
 	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
 	_box(rig, Vector3(1.05, 0.035, 0.5), Vector3(0.1, 0.04, 0.16), Color("2b2d36"))  # mouse
 	_box(rig, Vector3(0, -0.01, depth * 0.5 / u), Vector3(width / u, 0.05, 0.05), TRIM)   # orange front edge
-	_tea_cup(rig, Vector3(-1.9, 0.0, 0.55))
+	_tea_cup(rig, Vector3(-1.25, 0.0, 0.6))   # moved right so it does not sit on the left button
+	_action_pad(rig)
 	# cool glow from the screens onto the desk
 	var glow := OmniLight3D.new()
 	glow.light_color = Color("7fd8ff")
@@ -757,6 +817,39 @@ func _monitor(parent: Node3D, vp: SubViewport, pos: Vector3, yaw: float) -> void
 	quad.material_override = mat
 	quad.position = Vector3(0, 0, 0.04)
 	bezel.add_child(quad)
+
+
+## The three push-buttons, one per player action, along the front of the desk. Positions are in
+## desk-rig units: x = left / right (0 = middle of the desk), z = towards the player. To move a
+## button, change its Vector3 below. The nodes are called ActionPad > Station_<n> > ActionButton.
+func _action_pad(rig: Node3D) -> void:
+	var pad := Node3D.new()
+	pad.name = "ActionPad"
+	rig.add_child(pad)
+	var b1 := _action_button(pad, Vector3(-2.1, 0.0, 1.0), "RADIATION\nSHIELDING", Color("ffb02e"))   # left
+	var b2 := _action_button(pad, Vector3(0.0, 0.0, 1.0), "AIR\nFILTERING", Color("5ee0f0"))          # middle
+	var b3 := _action_button(pad, Vector3(2.1, 0.0, 1.0), "COVER SOLAR\nPANELS", Color("4ade80"))     # right
+	b1.pressed.connect(radiation_shielding)
+	b2.pressed.connect(air_filtering)
+	b3.pressed.connect(covering_solar_panels)
+
+
+## One button on its own small plate (the name is printed on the plate, behind the button).
+func _action_button(parent: Node3D, pos: Vector3, text: String, col: Color) -> ActionButton:
+	var station := Node3D.new()
+	station.name = "Station_%d" % _action_buttons.size()
+	station.position = pos
+	parent.add_child(station)
+	var plate := _box(station, Vector3(0, 0.025, -0.08), Vector3(0.62, 0.05, 0.56), Color("3b3d45"))
+	plate.material_override = _grunge(Color("3b3d45"))
+	_box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge
+	var b := ActionButton.new()
+	b.label_text = text
+	b.color = col
+	b.position = Vector3(0, 0.05, 0)
+	station.add_child(b)
+	_action_buttons.append(b)
+	return b
 
 
 func _props(desk: Dictionary) -> void:
