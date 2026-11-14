@@ -2,7 +2,7 @@ extends Node3D
 ## Mars control room built from the Kenney Space Station Kit (.glb files).
 ## Every model is measured when the scene starts, so no manual scaling is needed.
 ##
-## Monitor 1 ("status"):      power supply, solar panel durability (6 panels), oxygen supply   (screen_ui.gd)
+## Monitor 1 ("status"):      power supply, solar panel durability (6 panels), oxygen supply   (ScreenUI.gd, status_screen.tscn)
 ## Monitor 2 ("environment"): radiation, oxygen, toxic perchlorate                              (environment_screen.gd)
 ## Monitor 3 ("alerts"):      ONLY active warnings, black screen when there are none           (warnings_screen.gd)
 ## Esc opens the pause menu (see PauseMenu.gd).

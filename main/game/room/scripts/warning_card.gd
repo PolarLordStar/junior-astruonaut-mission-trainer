@@ -1,9 +1,9 @@
 class_name WarningCard
 extends PanelContainer
 ## One warning on the Warnings monitor: coloured side stripe, title, detail line and a severity badge.
-## The nodes are in scenes/warning_card.tscn. WarningsScreen makes one instance per active warning.
+## The nodes are in room/warning_card.tscn. WarningsScreen makes one instance per active warning.
 ##
-## Node tree (scenes/warning_card.tscn):
+## Node tree (room/warning_card.tscn):
 ##   WarningCard (PanelContainer)
 ##   └ Margin
 ##     └ Layout (HBox)

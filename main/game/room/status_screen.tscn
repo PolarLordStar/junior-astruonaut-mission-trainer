@@ -1,0 +1,147 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://main/game/room/scripts/ScreenUI.gd" id="1_screen"]
+[ext_resource type="PackedScene" path="res://main/game/room/status_meter.tscn" id="2_meter"]
+[ext_resource type="PackedScene" path="res://main/game/room/solar_panel_cell.tscn" id="3_cell"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.1765, 0.1804, 0.3333, 1)
+
+[node name="StatusScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 400.0
+script = ExtResource("1_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0588, 0.1059, 0.1686, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Margin/Layout/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.3686, 0.8784, 0.9412, 1)
+theme_override_font_sizes/font_size = 26
+text = "LIFE SUPPORT"
+
+[node name="ClockLabel" type="Label" parent="Margin/Layout/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_font_sizes/font_size = 22
+text = "SOL 000 · 00:00"
+
+[node name="PowerMeter" parent="Margin/Layout" instance=ExtResource("2_meter")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PowerMeter/Line" index="0"]
+text = "POWER SUPPLY"
+
+[node name="OxygenMeter" parent="Margin/Layout" instance=ExtResource("2_meter")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/OxygenMeter/Line" index="0"]
+text = "OXYGEN SUPPLY"
+
+[node name="PanelsHeader" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+
+[node name="PanelsTitle" type="Label" parent="Margin/Layout/PanelsHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_font_sizes/font_size = 20
+text = "SOLAR PANEL DURABILITY"
+
+[node name="PanelsAvgLabel" type="Label" parent="Margin/Layout/PanelsHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2902, 0.8706, 0.5020, 1)
+theme_override_font_sizes/font_size = 24
+text = "AVG 100%"
+
+[node name="PanelCells" type="HBoxContainer" parent="Margin/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Panel1" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel1" index="1"]
+text = "P1"
+
+[node name="Panel2" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel2" index="1"]
+text = "P2"
+
+[node name="Panel3" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel3" index="1"]
+text = "P3"
+
+[node name="Panel4" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel4" index="1"]
+text = "P4"
+
+[node name="Panel5" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel5" index="1"]
+text = "P5"
+
+[node name="Panel6" parent="Margin/Layout/PanelCells" instance=ExtResource("3_cell")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Margin/Layout/PanelCells/Panel6" index="1"]
+text = "P6"
+
+[node name="Frame" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frame")

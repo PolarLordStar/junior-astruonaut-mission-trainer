@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://main/game/room/scripts/status_meter.gd" id="1_meter"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.0863, 0.1529, 0.2392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2314, 0.2353, 0.4, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+resource_local_to_scene = true
+bg_color = Color(0.2902, 0.8706, 0.5020, 1)
+
+[node name="StatusMeter" type="VBoxContainer"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+script = ExtResource("1_meter")
+
+[node name="Line" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Line"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_font_sizes/font_size = 20
+text = "METER"
+
+[node name="ValueLabel" type="Label" parent="Line"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2902, 0.8706, 0.5020, 1)
+theme_override_font_sizes/font_size = 30
+text = "100%"
+
+[node name="Bar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+value = 100.0
+show_percentage = false

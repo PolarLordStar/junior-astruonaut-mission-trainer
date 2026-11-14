@@ -8,11 +8,11 @@
 [ext_resource type="Script" uid="uid://xjnicu66nyoc" path="res://main/game/room/scripts/radiation_sensor.gd" id="6_ci8aj"]
 [ext_resource type="Script" uid="uid://bb5ra556lstcs" path="res://main/game/room/scripts/oxygen_sensor.gd" id="7_42s7c"]
 [ext_resource type="Script" uid="uid://ct3iq4et8vccg" path="res://main/game/room/scripts/perchlorate_sensor.gd" id="8_mfua0"]
-[ext_resource type="Script" uid="uid://bc5xo01vd6okk" path="res://scripts/ScreenUI.gd" id="9_63k4a"]
+[ext_resource type="PackedScene" path="res://main/game/room/status_screen.tscn" id="9_63k4a"]
 [ext_resource type="PackedScene" path="res://main/game/room/environment_screen.tscn" id="10_bfyki"]
 [ext_resource type="PackedScene" path="res://main/game/room/warnings_screen.tscn" id="11_4dslu"]
 [ext_resource type="Shader" uid="uid://bbun788rmf4n6" path="res://shaders/vignette.gdshader" id="12_i4jdc"]
-[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="13_he2g7"]
+[ext_resource type="PackedScene" path="res://main/game/room/pause_menu.tscn" id="13_he2g7"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
@@ -89,11 +89,8 @@ unique_name_in_owner = true
 size = Vector2i(640, 400)
 render_target_update_mode = 4
 
-[node name="StatusScreen" type="Control" parent="StatusViewport" unique_id=1403468009]
+[node name="StatusScreen" parent="StatusViewport" unique_id=1403468009 instance=ExtResource("9_63k4a")]
 unique_name_in_owner = true
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("9_63k4a")
 
 [node name="EnvironmentViewport" type="SubViewport" parent="." unique_id=159556445]
 unique_name_in_owner = true

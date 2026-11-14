@@ -1,6 +1,6 @@
 class_name Sparkline
 extends Control
-## Tiny history graph used by StatRow (scenes/stat_row.tscn). Lines mark the warn / danger levels.
+## Tiny history graph used by StatRow (room/stat_row.tscn). Lines mark the warn / danger levels.
 
 const MAX_POINTS := 60
 

@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/PauseMenu.gd" id="1_pause"]
+[ext_resource type="Script" path="res://main/game/room/scripts/PauseMenu.gd" id="1_pause"]
 [ext_resource type="Script" path="res://scripts/mc_button.gd" id="2_btn"]
 
 [node name="PauseMenu" type="CanvasLayer"]

@@ -1,11 +1,11 @@
 class_name StatRow
 extends PanelContainer
 ## One line on the Environment monitor: name, big value + unit, a bar and a little history graph.
-## All the nodes are in scenes/stat_row.tscn, so you can restyle, move or hide any part in the editor.
+## All the nodes are in room/stat_row.tscn, so you can restyle, move or hide any part in the editor.
 ## EnvironmentScreen makes one instance of that scene per sensor (EnvironmentScreen.add_row({...}))
 ## and feeds it with set_value(). Colours switch automatically: green = normal, amber = warn, red = danger.
 ##
-## Node tree (scenes/stat_row.tscn):
+## Node tree (room/stat_row.tscn):
 ##   StatRow (PanelContainer)          <- renamed to Row_<id> when it is set up
 ##   └ Margin
 ##     └ Layout (HBox)

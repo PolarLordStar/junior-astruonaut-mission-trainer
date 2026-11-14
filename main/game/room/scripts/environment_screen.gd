@@ -1,17 +1,17 @@
 class_name EnvironmentScreen
 extends Control
-## Middle monitor: environment stats. All the nodes are in scenes/environment_screen.tscn,
+## Middle monitor: environment stats. All the nodes are in room/environment_screen.tscn,
 ## so every part (title, clock, frame ...) can be edited, hidden or restyled in the editor.
 ##
 ## WHERE THE ROWS COME FROM: every Sensor node with show_on_environment = true (RadiationSensor,
 ## OxygenSensor, PerchlorateSensor ...) gets a row here, in scene-tree order. Labels, units and
 ## limits live in each sensor's own script. control_room.gd pushes the values every frame.
 ## The rows are the only nodes made at run time (how many there are depends on the sensors).
-## Each row is an instance of scenes/stat_row.tscn.
+## Each row is an instance of room/stat_row.tscn.
 ##
 ## HOW TO ADD A STAT: add a new Sensor node (see Sensor.gd). Rows share the screen height, so about 4 fit.
 ##
-## Node tree (scenes/environment_screen.tscn):
+## Node tree (room/environment_screen.tscn):
 ##   EnvironmentScreen (Control)
 ##   ├ Background (ColorRect)
 ##   ├ Margin
@@ -20,7 +20,7 @@ extends Control
 ##   │   └ Rows (VBox): Row_radiation, Row_oxygen, Row_perchlorate  (StatRow instances)
 ##   └ Frame (Panel, the blue border)
 
-const STAT_ROW := preload("res://scenes/stat_row.tscn")
+const STAT_ROW := preload("res://main/game/room/stat_row.tscn")
 
 var rows := {}   # id -> StatRow
 

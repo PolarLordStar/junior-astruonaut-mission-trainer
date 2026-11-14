@@ -1,8 +1,8 @@
 class_name WarningsScreen
 extends Control
 ## Right monitor: shows ONLY active warnings. With no warnings the whole screen is black.
-## All the fixed nodes are in scenes/warnings_screen.tscn; each warning card is an instance of
-## scenes/warning_card.tscn, made when a warning appears and removed when it goes away.
+## All the fixed nodes are in room/warnings_screen.tscn; each warning card is an instance of
+## room/warning_card.tscn, made when a warning appears and removed when it goes away.
 ##
 ## HOW TO FEED IT: call set_warnings() with the full list of warnings that are active right now
 ## (call it every frame or whenever something changes). Anything not in the list disappears.
@@ -14,7 +14,7 @@ extends Control
 ## (1 amber, 2 orange, 3 red and flashing). Worst warnings are listed first, at most MAX_VISIBLE shown.
 ## control_room.gd builds this list in _collect_warnings(); edit that to change what counts as a warning.
 ##
-## Node tree (scenes/warnings_screen.tscn):
+## Node tree (room/warnings_screen.tscn):
 ##   WarningsScreen (Control)
 ##   ├ Background (ColorRect, black)
 ##   └ Content   <- hidden when there are no warnings = black screen
@@ -25,7 +25,7 @@ extends Control
 ##     └ Frame (Panel, the blue border)
 
 const MAX_VISIBLE := 3
-const WARNING_CARD := preload("res://scenes/warning_card.tscn")
+const WARNING_CARD := preload("res://main/game/room/warning_card.tscn")
 
 @onready var title_label: Label = %TitleLabel
 @onready var count_label: Label = %CountLabel

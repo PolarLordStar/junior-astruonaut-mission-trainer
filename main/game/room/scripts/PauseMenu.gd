@@ -4,9 +4,9 @@ extends CanvasLayer
 ## Continue closes it. Restart, Options and Return to Main Menu only send a signal,
 ## so control_room.gd decides what each one does.
 ##
-## All the nodes are in scenes/pause_menu.tscn (the buttons use the shared McButton look).
+## All the nodes are in room/pause_menu.tscn (the buttons use the shared McButton look).
 ##
-## Node tree (scenes/pause_menu.tscn):
+## Node tree (room/pause_menu.tscn):
 ##   PauseMenu (CanvasLayer)
 ##   └ Root
 ##     ├ Dim (ColorRect, darkens the game and blocks clicks behind the menu)
