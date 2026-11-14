@@ -13,7 +13,7 @@ extends Node
 ##
 ## You can also call it yourself from any script:
 ##   SaveManager.has_save()      -> bool
-##   SaveManager.load_day()      -> int  (0 if there is no save)
+##   SaveManager.load_day()      -> int  (DEFAULT_DAY = 1 if there is no save)
 ##   SaveManager.save_day(3)
 ##   SaveManager.delete_save()   # new game / reset progress
 ##
@@ -21,6 +21,9 @@ extends Node
 
 const SAVE_PATH := "user://save.cfg"
 const SECTION := "progress"
+
+## The day a brand-new game (no save file) starts on.
+const DEFAULT_DAY := 1
 
 ## Turn off to only SAVE the day without ever loading it back into the game.
 const RESTORE_ON_LOAD := true
@@ -31,25 +34,26 @@ const RESTORE_ON_LOAD := true
 const GAME_ADDS_ONE_ON_START := true
 
 var _game: Node = null     # the Game node currently in the scene tree
-var _last_saved := 0       # last day number written to (or read from) the file
+var _last_saved := 0       # last day number written to (or read from) the file; 0 = nothing saved yet
 
 
 func _ready() -> void:
-	_last_saved = load_day()
+	_last_saved = load_day() if has_save() else 0
 	get_tree().node_added.connect(_on_node_added)
 
 
 # ---------- public API ----------
 func has_save() -> bool:
-	return load_day() > 0
+	var cfg := ConfigFile.new()
+	return cfg.load(SAVE_PATH) == OK and cfg.has_section_key(SECTION, "day_number")
 
 
-## Returns the saved day number, or 0 when there is no save file yet.
+## Returns the saved day number, or DEFAULT_DAY (1) when there is no save file yet.
 func load_day() -> int:
 	var cfg := ConfigFile.new()
 	if cfg.load(SAVE_PATH) != OK:
-		return 0
-	return int(cfg.get_value(SECTION, "day_number", 0))
+		return DEFAULT_DAY
+	return maxi(int(cfg.get_value(SECTION, "day_number", DEFAULT_DAY)), DEFAULT_DAY)
 
 
 func save_day(day: int) -> void:
@@ -63,7 +67,7 @@ func save_day(day: int) -> void:
 	_last_saved = day
 
 
-## Deletes the save file, so the next game starts on day 1.
+## Deletes the save file, so the next game starts on day 1 (DEFAULT_DAY).
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -76,7 +80,7 @@ func _on_node_added(node: Node) -> void:
 	if not ("day_number" in node):
 		return
 	_game = node
-	if RESTORE_ON_LOAD and has_save():
+	if RESTORE_ON_LOAD:   # with no save file, load_day() gives DEFAULT_DAY, so a new game starts on day 1
 		var start_value := load_day() - (1 if GAME_ADDS_ONE_ON_START else 0)
 		node.set("day_number", maxi(start_value, 0))
 
