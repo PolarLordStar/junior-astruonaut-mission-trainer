@@ -11,7 +11,7 @@ var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var storm_system: StormSystem = $ControlRoom/StormSystem
 @onready var _room = $ControlRoom
 
-var day_number: int = 4
+var day_number: int = save_script.load_day()
 var date
 
 func setup() -> void:
