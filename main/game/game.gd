@@ -1,45 +1,74 @@
 extends Node
-var preset_values = preload("res://main/libraries/preset_values.gd")
+var preset_values = preload("res://main/libraries/preset_values.gd").new()
 var player_script = preload("res://main/game/player/player.gd").new()
-var save_script = preload("res://scripts/save_manager.gd")
+var save_script = preload("res://scripts/save_manager.gd").new()
 var components_script = preload("res://main/game/components/components.gd").new()
+@onready var day_counter: CanvasLayer = $DayCounter
+@onready var day_transition: CanvasLayer = $DayTransition   # "You have survived!" screen (ui/day_transition.tscn)
 
-var day_number: int = save_script.new().load_day()
+var day_number: int = save_script.load_day()
 var date
 
 func setup() -> void:
 	# Resetting Values
+	player_script.health = preset_values.MAX_HEALTH
+	components_script.Radiation = preset_values.RADIATION
+	components_script.Power = preset_values.POWER
+	components_script.Oxygen = preset_values.OXYGEN
+	components_script.ToxicPerch = preset_values.TOXIC_PERCH
+	components_script.SolarPanels = preset_values.SOLAR_PANELS
+	
+	components_script.AirFilteringUsing = false
+	components_script.CoverSolarPanUsing = false
+	components_script.RadiationShieldingUsing = false
+	
 	day_number += 1
 	date = await DonkiService.fetch_random_day()
 	
-	# Resetting Components
-	player_script.health = preset_values.new().MAX_HEALTH
-	# ...
-	
 	# Enabling Day-Dependent Components
-	# ...
+	update_day_by_day_components()
 	
 	# Events
 	components_script.events_for_today = {}
 	components_script.events_to_occur = {}
 	components_script.events_occurring = {}
-	components_script.decide_events(date, day_number)
+	components_script.SolarEventOccurring = false
+	components_script.StormOccurring = components_script.STORMS.NONE
+	components_script.decide_events(date)
 	start_event_timers()
 	
 	# Other
-	$Timers/DayTimer.wait_time = preset_values.new().DAY_DURATION
 	$Timers/DayTimer.start()
 	$Timers/TickUpdateTimer.start()
 
 
 # START OR NEXT DAY FUNCTIONS
 func start() -> void:
-	# ...screen saying Day Number
 	setup()
+	day_counter.show_day(day_number)
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
-	# ...screen saying day number survived
+	# The day is over: freeze the game and show the transition screen. It does NOT start the next day by
+	# itself any more, the player chooses with the two buttons (see the two functions below).
+	# On the last day there is no next day, so the Continue button is hidden.
+	get_tree().paused = true
+	day_transition.show_transition(day_number < preset_values.MAX_DAYS)
+
+
+# "Continue" on the transition screen: reset the day timer and start the next day.
+func _on_transition_continue() -> void:
+	$Timers/DayTimer.wait_time = preset_values.DAY_DURATION   # the day timer's original value again
+	get_tree().paused = false
+	start()   # setup() restarts DayTimer + TickUpdateTimer, and the day counter shows the new day number
+
+
+# "Return to Main Menu" on the transition screen.
+func _on_transition_main_menu() -> void:
+	get_tree().paused = false   # undo the pause from _on_day_end() first
+	get_tree().change_scene_to_file("res://main_menu.tscn")
+
+
 func _ready() -> void:
 	start()
 
@@ -73,6 +102,7 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	# 1. Move the event from events_to_occur to events_occurring
 	components_script.events_to_occur.erase(event_dict)
 	components_script.events_occurring[event_dict] = duration
+	components_script.update_occurring_flags()
 	print("Event started: ", event_dict, " | Ends in: ", duration, "s")
 	
 	# 2. Clean up the start delay timer
@@ -86,16 +116,95 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	
 	end_timer.timeout.connect(_on_event_duration_timeout.bind(event_dict, end_timer))
 	end_timer.start()
+	
+	
+
 
 func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> void:
 	# Remove the expired event from events_occurring
 	components_script.events_occurring.erase(event_dict)
+	components_script.update_occurring_flags()
 	print("Event ended: ", event_dict)
 	
 	# Clean up the duration timer node
 	end_timer.queue_free()
+	
+	
+	
 
 
 # COMPONENTS
+func update_day_by_day_components() -> void:
+	match day_number:
+		1:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = false
+			components_script.ToxicPerchEnabled = false
+			components_script.SolarPanEnabled = false
+			components_script.StormsEnabled = false
+			components_script.SlowStormsEnabled = false
+			components_script.FastStormsEnabled = false
+			
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = false
+			components_script.CoverSolarPanEnabled = false
+		
+		2:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = false
+			components_script.StormsEnabled = false
+			components_script.SlowStormsEnabled = false
+			components_script.FastStormsEnabled = false
+			
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = false
+		
+		3:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
+		
+		4:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
+		
+		5:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
+
 func _updating_tick() -> void:
 	components_script.tick_update()
