@@ -6,7 +6,8 @@ var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var player_sounds = $PlayerSounds
 @onready var day_counter: CanvasLayer = $DayCounter
 @onready var day_transition: CanvasLayer = $DayTransition   # "You have survived!" screen (ui/day_transition.tscn)
-
+@onready var _status_screen: ScreenUI = $ControlRoom/StatusViewport/StatusScreen
+@onready var _env_screen: EnvironmentScreen = $ControlRoom/EnvironmentViewport/EnvironmentScreen
 
 var day_number: int = save_script.load_day()
 var date
@@ -70,6 +71,12 @@ func _on_transition_main_menu() -> void:
 func _ready() -> void:
 	day_transition.continue_pressed.connect(_on_transition_continue)
 	day_transition.main_menu_pressed.connect(_on_transition_main_menu)
+	_status_screen.show_power()
+	_status_screen.hide_oxygen()
+	_status_screen.hide_solar_panels()
+	_env_screen.show_radiation()
+	_env_screen.hide_perchlorate()
+	
 	start()
 
 # PLAYER SOUNDS (scripts/game_sounds.gd, room/scripts/ambience_player.gd)
@@ -153,6 +160,13 @@ func update_day_by_day_components() -> void:
 			components_scene.OxygenEnabled = false
 			components_scene.ToxicPerchEnabled = false
 			components_scene.SolarPanEnabled = false
+			
+			_status_screen.show_power()
+			_status_screen.hide_oxygen()
+			_status_screen.hide_solar_panels()
+			_env_screen.show_radiation()
+			_env_screen.hide_perchlorate()
+			
 			components_scene.StormsEnabled = false
 			components_scene.SlowStormsEnabled = false
 			components_scene.FastStormsEnabled = false
@@ -167,6 +181,13 @@ func update_day_by_day_components() -> void:
 			components_scene.OxygenEnabled = true
 			components_scene.ToxicPerchEnabled = true
 			components_scene.SolarPanEnabled = false
+			
+			_status_screen.show_power()
+			_status_screen.show_oxygen()
+			_status_screen.hide_solar_panels()
+			_env_screen.show_radiation()
+			_env_screen.show_perchlorate()
+			
 			components_scene.StormsEnabled = false
 			components_scene.SlowStormsEnabled = false
 			components_scene.FastStormsEnabled = false
@@ -181,6 +202,13 @@ func update_day_by_day_components() -> void:
 			components_scene.OxygenEnabled = true
 			components_scene.ToxicPerchEnabled = true
 			components_scene.SolarPanEnabled = true
+			
+			_status_screen.show_power()
+			_status_screen.show_oxygen()
+			_status_screen.show_solar_panels()
+			_env_screen.show_radiation()
+			_env_screen.show_perchlorate()
+			
 			components_scene.StormsEnabled = true
 			components_scene.SlowStormsEnabled = true
 			components_scene.FastStormsEnabled = true
@@ -195,6 +223,13 @@ func update_day_by_day_components() -> void:
 			components_scene.OxygenEnabled = true
 			components_scene.ToxicPerchEnabled = true
 			components_scene.SolarPanEnabled = true
+			
+			_status_screen.show_power()
+			_status_screen.show_oxygen()
+			_status_screen.show_solar_panels()
+			_env_screen.show_radiation()
+			_env_screen.show_perchlorate()
+			
 			components_scene.StormsEnabled = true
 			components_scene.SlowStormsEnabled = true
 			components_scene.FastStormsEnabled = true
@@ -209,6 +244,13 @@ func update_day_by_day_components() -> void:
 			components_scene.OxygenEnabled = true
 			components_scene.ToxicPerchEnabled = true
 			components_scene.SolarPanEnabled = true
+			
+			_status_screen.show_power()
+			_status_screen.show_oxygen()
+			_status_screen.show_solar_panels()
+			_env_screen.show_radiation()
+			_env_screen.show_perchlorate()
+			
 			components_scene.StormsEnabled = true
 			components_scene.SlowStormsEnabled = true
 			components_scene.FastStormsEnabled = true

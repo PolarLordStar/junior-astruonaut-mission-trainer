@@ -60,3 +60,11 @@ func set_day_time(seconds_left: float) -> void:
 func set_time(clock_s: float) -> void:
 	if clock_label != null:
 		clock_label.text = "%02d:%02d" % [int(clock_s / 3600.0), int(fmod(clock_s, 3600.0) / 60.0)]
+
+
+# ENABLING AND DISABLING COMPONENTS
+func show_radiation() -> void:       rows["radiation"].show()
+func hide_radiation() -> void:       rows["radiation"].hide()
+
+func show_perchlorate() -> void:     rows["perchlorate"].show()
+func hide_perchlorate() -> void:     rows["perchlorate"].hide()

@@ -1,16 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cknhjsffmnew0"]
 
-[ext_resource type="Script" path="res://main/game/room/scripts/ScreenUI.gd" id="1_screen"]
+[ext_resource type="Script" uid="uid://bc5xo01vd6okk" path="res://main/game/room/scripts/ScreenUI.gd" id="1_screen"]
 [ext_resource type="PackedScene" path="res://main/game/room/status_meter.tscn" id="2_meter"]
 [ext_resource type="PackedScene" path="res://main/game/room/solar_panel_cell.tscn" id="3_cell"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
-bg_color = Color(0, 0, 0, 0)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.1765, 0.1804, 0.3333, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grid"]
 content_margin_left = 5.0
@@ -33,14 +25,22 @@ corner_radius_bottom_right = 48
 corner_radius_bottom_left = 48
 corner_detail = 16
 
-[node name="StatusScreen" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.1765, 0.1804, 0.3333, 1)
+
+[node name="StatusScreen" type="Control" unique_id=1644346265]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 400.0
 script = ExtResource("1_screen")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1789664925]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -49,7 +49,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0588, 0.1059, 0.1686, 1)
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=207335148]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -61,14 +61,14 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 18
 
-[node name="Layout" type="VBoxContainer" parent="Margin"]
+[node name="Layout" type="VBoxContainer" parent="Margin" unique_id=441717522]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+[node name="Header" type="HBoxContainer" parent="Margin/Layout" unique_id=104714300]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="Margin/Layout/Header"]
+[node name="TitleLabel" type="Label" parent="Margin/Layout/Header" unique_id=910651440]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -76,74 +76,68 @@ theme_override_colors/font_color = Color(0.3686, 0.8784, 0.9412, 1)
 theme_override_font_sizes/font_size = 26
 text = "LIFE SUPPORT"
 
-[node name="PowerMeter" parent="Margin/Layout" instance=ExtResource("2_meter")]
+[node name="PowerMeter" parent="Margin/Layout" unique_id=1254448453 instance=ExtResource("2_meter")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="NameLabel" parent="Margin/Layout/PowerMeter/Line" index="0"]
-text = "POWER SUPPLY"
-
-[node name="OxygenMeter" parent="Margin/Layout" instance=ExtResource("2_meter")]
+[node name="OxygenMeter" parent="Margin/Layout" unique_id=462208462 instance=ExtResource("2_meter")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="NameLabel" parent="Margin/Layout/OxygenMeter/Line" index="0"]
-text = "OXYGEN SUPPLY"
-
-[node name="PanelsHeader" type="HBoxContainer" parent="Margin/Layout"]
+[node name="PanelsHeader" type="HBoxContainer" parent="Margin/Layout" unique_id=1535628190]
 layout_mode = 2
 
-[node name="PanelsTitle" type="Label" parent="Margin/Layout/PanelsHeader"]
+[node name="PanelsTitle" type="Label" parent="Margin/Layout/PanelsHeader" unique_id=36055963]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_colors/font_color = Color(0.549, 0.5804, 0.7843, 1)
 theme_override_font_sizes/font_size = 20
 text = "NUMBER OF SOLAR PANELS"
 
-[node name="PanelsRow" type="HBoxContainer" parent="Margin/Layout"]
+[node name="PanelsRow" type="HBoxContainer" parent="Margin/Layout" unique_id=976283683]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 20
 
-[node name="GridBox" type="PanelContainer" parent="Margin/Layout/PanelsRow"]
+[node name="GridBox" type="PanelContainer" parent="Margin/Layout/PanelsRow" unique_id=293118075]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_grid")
 
-[node name="PanelCells" type="GridContainer" parent="Margin/Layout/PanelsRow/GridBox"]
+[node name="PanelCells" type="GridContainer" parent="Margin/Layout/PanelsRow/GridBox" unique_id=2104248733]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 4
 theme_override_constants/v_separation = 4
 columns = 3
 
-[node name="Panel1" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel1" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=443620126 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="Panel2" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel2" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=1123864791 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="Panel3" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel3" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=2009128652 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="Panel4" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel4" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=961199301 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="Panel5" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel5" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=1531233504 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="Panel6" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" instance=ExtResource("3_cell")]
+[node name="Panel6" parent="Margin/Layout/PanelsRow/GridBox/PanelCells" unique_id=222868134 instance=ExtResource("3_cell")]
 layout_mode = 2
 
-[node name="CountCircle" type="Panel" parent="Margin/Layout/PanelsRow"]
+[node name="CountCircle" type="Panel" parent="Margin/Layout/PanelsRow" unique_id=1763454066]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_count")
 
-[node name="CountLabel" type="Label" parent="Margin/Layout/PanelsRow/CountCircle"]
+[node name="CountLabel" type="Label" parent="Margin/Layout/PanelsRow/CountCircle" unique_id=1183048606]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -157,7 +151,7 @@ text = "6"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Frame" type="Panel" parent="."]
+[node name="Frame" type="Panel" parent="." unique_id=790416872]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
