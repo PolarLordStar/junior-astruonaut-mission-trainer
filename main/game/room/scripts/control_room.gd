@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node3D
 ## Mars control room built from the Kenney Space Station Kit (.glb files).
 ## Every model is measured when the scene starts, so no manual scaling is needed.

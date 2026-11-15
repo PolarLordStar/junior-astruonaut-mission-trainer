@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name OptionsMenu
 extends CanvasLayer
 ## The Options screen opened by the main-menu Options button.

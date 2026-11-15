@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name RestartButton
 extends McButton
 ## "Restart": not set up yet.

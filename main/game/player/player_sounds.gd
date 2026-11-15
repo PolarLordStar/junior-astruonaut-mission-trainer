@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 ## ALL the player + control-room ambience sounds live here, separate from game.gd and player.gd.
 ## Put this script on a Node called "PlayerSounds" that is a child of Game, next to "Player".

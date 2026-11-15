@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name GameSounds
 extends RefCounted
 ## The player's sounds (hurt, death, retry) plus the one rule that turns the "Common sound"

@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name StormGenerator
 extends RefCounted
 ## Picks a random storm for the current day.

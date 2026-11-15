@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name PerchlorateSensor
 extends Sensor
 ## In the game its value is Components.ToxicPerch (0 .. MAX_TOXIC_PERCH), converted to this sensor's range.

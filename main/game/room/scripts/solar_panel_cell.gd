@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name SolarPanelCell
 extends ColorRect
 ## One solar panel on the Life Support monitor: a plain rectangle, green when the panel works

@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name Sparkline
 extends Control
 ## Tiny history graph used by StatRow (room/stat_row.tscn). Lines mark the warn / danger levels.
