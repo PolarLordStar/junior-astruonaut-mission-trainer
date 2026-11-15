@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name Sensor
 extends Node
 ## Base class for ONE stat on the control-room monitors (radiation, oxygen, power ...).

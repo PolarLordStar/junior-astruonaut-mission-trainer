@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name StatRow
 extends PanelContainer
 ## One line on the Environment monitor: name, a big percentage, a bar and a little history graph.

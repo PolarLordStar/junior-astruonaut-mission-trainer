@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 
 signal event_triggered(event: Dictionary)

@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name AmbiencePlayer
 extends AudioStreamPlayer
 ## The control-room background hum. It is the AmbiencePlayer node in control_room.tscn.

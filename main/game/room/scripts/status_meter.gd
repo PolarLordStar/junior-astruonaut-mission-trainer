@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name StatusMeter
 extends VBoxContainer
 ## One big bar on the Life Support monitor: a name, the value in % and a bar that turns amber / red

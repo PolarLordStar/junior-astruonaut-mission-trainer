@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name ContinueButton
 extends McButton
 ## "Continue": fades the screen to black, then loads the game.

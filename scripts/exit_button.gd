@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name ExitButton
 extends McButton
 ## "Exit": closes the game, either by clicking the button or by pressing Esc.

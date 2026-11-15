@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name MarsBackground
 extends Control
 ## Animated Mars backdrop for the main menu: pulsing sun, hazy mesas, slowly scrolling dunes

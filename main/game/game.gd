@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 var save_script = preload("res://scripts/save_manager.gd").new()

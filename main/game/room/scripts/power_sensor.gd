@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name PowerSensor
 extends Sensor
 ## In the game its value is Components.Power (0 .. MAX_POWER), converted to this sensor's range.

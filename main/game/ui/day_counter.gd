@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends CanvasLayer
 ## Day counter + clock UI, kept in its own script so game.gd stays untouched.
 ##

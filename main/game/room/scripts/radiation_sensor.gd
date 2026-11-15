@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name RadiationSensor
 extends Sensor
 ## In the game its value is Components.Radiation (0 .. MAX_RADIATION), converted to this sensor's range.
