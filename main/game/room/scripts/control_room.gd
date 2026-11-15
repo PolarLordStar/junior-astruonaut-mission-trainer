@@ -189,9 +189,34 @@ func _val(id: String) -> float:
 
 # ---------- pause menu ----------
 # The PauseMenu node is in control_room.tscn; its three signals are connected to these there.
+const GAME_SCENE := "res://main/game/game.tscn"
+var _restarting := false
+
+
+## Same as the main-menu "Restart": retry sound, delete the save, fade to black, reload the game.
 func _on_restart() -> void:
-	# TODO: restart behaviour (to be decided).
-	_menu.toast("Restart is not set up yet")
+	if _restarting:
+		return
+	_restarting = true
+	GameSounds.play_retry()   # keeps playing after the scene change
+	preload("res://scripts/save_manager.gd").new().delete_save()
+	var layer := CanvasLayer.new()
+	layer.layer = 200
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS   # keep fading while the game is paused
+	var fade := ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.mouse_filter = Control.MOUSE_FILTER_STOP
+	fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(fade)
+	get_tree().root.add_child(layer)
+	var tw := layer.create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(fade, "color:a", 1.0, 0.5)
+	tw.tween_callback(func():
+		var tree := get_tree()
+		tree.paused = false   # the pause menu paused the tree; undo it first
+		tree.change_scene_to_file(GAME_SCENE)
+		layer.queue_free())
 
 
 ## Same as the main-menu "Options": opens the Options screen on top of the pause menu.
@@ -904,12 +929,13 @@ func _action_button(parent: Node3D, pos: Vector3, text: String, col: Color) -> A
 	parent.add_child(station)
 	var plate := _box(station, Vector3(0, 0.025, -0.08), Vector3(0.62, 0.05, 0.56), Color("3b3d45"))
 	plate.material_override = _grunge(Color("3b3d45"))
-	_box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge
+	var bar := _box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge: lights up when the button is ON
 	var b := ActionButton.new()
 	b.label_text = text
 	b.color = col
 	b.position = Vector3(0, 0.05, 0)
 	station.add_child(b)
+	b.setup_indicator(bar)
 	_action_buttons.append(b)
 	return b
 
