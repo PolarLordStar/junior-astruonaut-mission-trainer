@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://crroo36paioj6" path="res://main/game/room/control_room.tscn" id="2_5mlo5"]
 [ext_resource type="PackedScene" uid="uid://cj6kmyru4uqrm" path="res://main/game/components/components.tscn" id="2_gpuo4"]
 [ext_resource type="PackedScene" uid="uid://x0mt4djj6vod" path="res://main/game/ui/day_counter.tscn" id="3_daycounter"]
+[ext_resource type="PackedScene" path="res://main/game/ui/day_transition.tscn" id="5_458dk"]
 
 [node name="Game" type="Node" unique_id=466476844]
 script = ExtResource("1_3epdo")
@@ -13,7 +14,7 @@ script = ExtResource("1_3epdo")
 [node name="Timers" type="Node" parent="." unique_id=956759653]
 
 [node name="DayTimer" type="Timer" parent="Timers" unique_id=1035871489]
-wait_time = 300.0
+wait_time = 20.0
 one_shot = true
 
 [node name="TickUpdateTimer" type="Timer" parent="Timers" unique_id=1591023496]
@@ -21,6 +22,8 @@ one_shot = true
 [node name="ControlRoom" parent="." unique_id=1901615750 instance=ExtResource("2_5mlo5")]
 
 [node name="DayCounter" parent="." unique_id=1010252669 instance=ExtResource("3_daycounter")]
+
+[node name="DayTransition" parent="." unique_id=2083233202 instance=ExtResource("5_458dk")]
 
 [connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
 [connection signal="timeout" from="Timers/TickUpdateTimer" to="." method="_updating_tick"]
