@@ -828,7 +828,7 @@ func _desk() -> Dictionary:
 	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
 	_box(rig, Vector3(1.05, 0.035, 0.5), Vector3(0.1, 0.04, 0.16), Color("2b2d36"))  # mouse
 	_box(rig, Vector3(0, -0.01, depth * 0.5 / u), Vector3(width / u, 0.05, 0.05), TRIM)   # orange front edge
-	_tea_cup(rig, Vector3(-1.25, 0.0, 0.6))   # moved right so it does not sit on the left button
+	_tea_cup(rig, Vector3(-1.25, 0.0, 0.6))   # kept away from the buttons
 	_action_pad(rig)
 	# cool glow from the screens onto the desk
 	var glow := OmniLight3D.new()
@@ -873,27 +873,52 @@ func _monitor(parent: Node3D, vp: SubViewport, pos: Vector3, yaw: float) -> void
 	bezel.add_child(quad)
 
 
-## The three push-buttons, one per player action, along the front of the desk. Positions are in
-## desk-rig units: x = left / right (0 = middle of the desk), z = towards the player. To move a
-## button, change its Vector3 below. The nodes are called ActionPad > Station_<n> > ActionButton.
+## The three push-buttons, one per player action. They are spread around the room, so the player
+## has to walk to them (movement is coming):
+##   - Radiation Shielding : on the front of the LEFT server rack (left wall)
+##   - Air Filtering       : on the back edge of the desk, behind the two right-hand monitors
+##   - Cover Solar Panels  : on the front of the RIGHT locker (right wall)
+## To move one, change its position below. All positions are in ROOM units (x = left / right,
+## y = up, z = towards the player is bigger, the window is at z = -ROWS * tile). The nodes are
+## called ActionPad / WallPad > Station_<n> > ActionButton.
+const WALL_BTN_Z_LEFT := -2.52    # along the room: where the left (rack) button sits
+const WALL_BTN_Z_RIGHT := -2.66   # ... and the right (locker) button
+const WALL_BTN_Y_LEFT := 0.78     # height above the floor
+const WALL_BTN_Y_RIGHT := 0.85
+const WALL_BTN_X := 1.69          # distance from the middle of the room (the rack / locker fronts)
+const DESK_BTN_X := 0.33          # air filtering button: x on the desk (behind the right monitors)
+const DESK_BTN_Z := -2.10         # ... and z (the back edge of the desk is at about -2.21)
+
+
 func _action_pad(rig: Node3D) -> void:
+	var u := rig.scale.x   # the buttons keep the same size as before (the desk rig is scaled down)
+	var wall_pad := Node3D.new()
+	wall_pad.name = "WallPad"
+	add_child(wall_pad)
+	# A button on a wall points sideways into the room, with its name still the right way up.
+	# Left wall: the button points to +x. Right wall: it points to -x.
+	var points_right := Basis(Vector3(0, 0, -1), Vector3(1, 0, 0), Vector3(0, -1, 0)).scaled_local(Vector3.ONE * u)
+	var points_left := Basis(Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0)).scaled_local(Vector3.ONE * u)
+	var b1 := _action_button(wall_pad, Vector3(-WALL_BTN_X, WALL_BTN_Y_LEFT, WALL_BTN_Z_LEFT), "RADIATION\nSHIELDING", Color("ffb02e"), points_right)   # left wall
 	var pad := Node3D.new()
 	pad.name = "ActionPad"
 	rig.add_child(pad)
-	var b1 := _action_button(pad, Vector3(-2.1, 0.0, 1.0), "RADIATION\nSHIELDING", Color("ffb02e"))   # left
-	var b2 := _action_button(pad, Vector3(0.0, 0.0, 1.0), "AIR\nFILTERING", Color("5ee0f0"))          # middle
-	var b3 := _action_button(pad, Vector3(2.1, 0.0, 1.0), "COVER SOLAR\nPANELS", Color("4ade80"))     # right
+	# the desk rig is moved and scaled, so convert the room position to desk-rig units
+	var b2_pos := Vector3(DESK_BTN_X - rig.position.x, 0.0, DESK_BTN_Z - rig.position.z) / u
+	var b2 := _action_button(pad, b2_pos, "AIR\nFILTERING", Color("5ee0f0"))                                                                         # behind the right monitors
+	var b3 := _action_button(wall_pad, Vector3(WALL_BTN_X, WALL_BTN_Y_RIGHT, WALL_BTN_Z_RIGHT), "COVER SOLAR\nPANELS", Color("4ade80"), points_left)   # right wall
 	b1.pressed.connect(radiation_shielding)
 	b2.pressed.connect(air_filtering)
 	b3.pressed.connect(covering_solar_panels)
 
 
 ## One button on its own small plate (the name is printed on the plate, behind the button).
-func _action_button(parent: Node3D, pos: Vector3, text: String, col: Color) -> ActionButton:
+## "basis" turns / scales the whole button (used for the ones on the walls).
+func _action_button(parent: Node3D, pos: Vector3, text: String, col: Color, basis := Basis.IDENTITY) -> ActionButton:
 	var station := Node3D.new()
 	station.name = "Station_%d" % _action_buttons.size()
-	station.position = pos
 	parent.add_child(station)
+	station.transform = Transform3D(basis, pos)
 	var plate := _box(station, Vector3(0, 0.025, -0.08), Vector3(0.62, 0.05, 0.56), Color("3b3d45"))
 	plate.material_override = _grunge(Color("3b3d45"))
 	_box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge
