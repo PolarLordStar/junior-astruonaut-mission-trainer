@@ -116,6 +116,7 @@ var window_bars: Array[MeshInstance3D] = []   # the 2 bars between the window pa
 var _bars_root: Node3D
 var _action_buttons: Array[ActionButton] = []   # the 3 push-buttons on the desk
 var _hovered: ActionButton                      # the button the mouse is over right now (or null)
+var _alerts_quad: MeshInstance3D                 # the picture of the right-hand (warnings) monitor, used to scroll it
 
 
 func _ready() -> void:
@@ -162,6 +163,8 @@ func _process(delta: float) -> void:
 	cam.rotation_degrees.x = CAM_PITCH + _shake_off.x
 	cam.rotation_degrees.z = _shake_off.y
 	_set_hovered(_button_under_mouse())
+	if _alerts_screen != null:
+		_alerts_screen.set_hovered(_mouse_over_alerts())
 
 
 # ---------- data nodes ----------
@@ -240,12 +243,62 @@ func _on_main_menu() -> void:
 # ---------- desk buttons ----------
 ## Left-click on one of the three desk buttons presses it.
 func _unhandled_input(event: InputEvent) -> void:
+	if _scroll_alerts(event):
+		get_viewport().set_input_as_handled()
+		return
 	var click := event as InputEventMouseButton
 	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
 		var b := _button_under_mouse()
 		if b != null:
 			b.press()
 			get_viewport().set_input_as_handled()
+
+
+# Scrolling the warnings monitor (the right one). Tweak these to taste.
+const WHEEL_STEP := 60.0   # how far one notch of the mouse wheel scrolls (pixels of the monitor picture)
+const PAN_STEP := 40.0     # trackpad scrolling: bigger = faster
+
+
+## Mouse wheel (or two-finger trackpad scroll) over the right monitor scrolls the warnings list,
+## for when more warnings are active than fit on the screen. Returns true if the event was used.
+func _scroll_alerts(event: InputEvent) -> bool:
+	if _alerts_screen == null or _alerts_quad == null:
+		return false
+	var wheel := event as InputEventMouseButton
+	if wheel != null:
+		if not wheel.pressed:
+			return false
+		if wheel.button_index != MOUSE_BUTTON_WHEEL_UP and wheel.button_index != MOUSE_BUTTON_WHEEL_DOWN:
+			return false
+		if not _mouse_over_alerts():
+			return false
+		var amount := WHEEL_STEP * (wheel.factor if wheel.factor > 0.0 else 1.0)
+		_alerts_screen.scroll_by(-amount if wheel.button_index == MOUSE_BUTTON_WHEEL_UP else amount)
+		return true
+	var pan := event as InputEventPanGesture
+	if pan != null and _mouse_over_alerts():
+		_alerts_screen.scroll_by(pan.delta.y * PAN_STEP)
+		return true
+	return false
+
+
+## True if the mouse is over the picture of the right-hand (warnings) monitor. Same idea as
+## ActionButton.ray_hits: a ray from the camera through the mouse, here tested against the flat screen.
+func _mouse_over_alerts() -> bool:
+	if _alerts_quad == null or not _alerts_quad.is_inside_tree():
+		return false
+	var mp := get_viewport().get_mouse_position()
+	var inv := _alerts_quad.global_transform.affine_inverse()
+	var o := inv * cam.project_ray_origin(mp)        # the ray in the screen's own coordinates:
+	var d := inv.basis * cam.project_ray_normal(mp)  # the screen is the flat plane z = 0 there
+	if absf(d.z) < 0.00001:
+		return false
+	var t := -o.z / d.z
+	if t < 0.0:
+		return false
+	var hit := o + d * t
+	var half := (_alerts_quad.mesh as QuadMesh).size * 0.5
+	return absf(hit.x) <= half.x and absf(hit.y) <= half.y
 
 
 func _button_under_mouse() -> ActionButton:
@@ -904,6 +957,8 @@ func _monitor(parent: Node3D, vp: SubViewport, pos: Vector3, yaw: float) -> void
 	quad.material_override = mat
 	quad.position = Vector3(0, 0, 0.04)
 	bezel.add_child(quad)
+	if vp == _alerts_viewport:
+		_alerts_quad = quad
 
 
 ## The three push-buttons, one per player action, along the front of the desk. Positions are in

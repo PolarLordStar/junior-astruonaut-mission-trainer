@@ -10,6 +10,13 @@ border_width_right = 8
 border_width_bottom = 8
 border_color = Color(0.1765, 0.1804, 0.3333, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_thumb"]
+bg_color = Color(0.549, 0.5804, 0.7843, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [node name="WarningsScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 0
@@ -69,11 +76,23 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1.0000, 0.3529, 0.2902, 1)
 theme_override_font_sizes/font_size = 22
 
-[node name="Cards" type="VBoxContainer" parent="Content/Margin/Layout"]
+[node name="CardsClip" type="Control" parent="Content/Margin/Layout"]
 unique_name_in_owner = true
+clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Cards" type="VBoxContainer" parent="Content/Margin/Layout/CardsClip"]
+unique_name_in_owner = true
+layout_mode = 0
 theme_override_constants/separation = 10
+
+[node name="ScrollThumb" type="Panel" parent="Content/Margin/Layout/CardsClip"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_thumb")
 
 [node name="Frame" type="Panel" parent="Content"]
 layout_mode = 1
