@@ -37,12 +37,12 @@ const FAST_STORM_SP_DAMAGE_CHANCE: float = 0.05
 
 const RADIATION_GCR_INCREASE: int = 1
 const RADIATION_SOLAR_EVENT_INCREASES := {
-	"Tiny Sun Flash": 2,
-	"Small Sun Flash": 3,
-	"Medium Sun Flash": 4,
-	"Giant Sun Flash": 4,
-	"Solar Cloud": 3,
-	"Radiation Storm": 5,
+	"Tiny Sun Flash": 0.5,
+	"Small Sun Flash": 1,
+	"Medium Sun Flash": 2,
+	"Giant Sun Flash": 2,
+	"Solar Cloud": 0.5, #
+	"Radiation Storm": 2,
 }
 const CRITICAL_RADIATION: int = 90 # decreases health above or equal
 const RADIATION_DAMAGE_HEALTH: int = 5
