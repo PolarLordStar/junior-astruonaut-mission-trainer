@@ -55,6 +55,7 @@ const SHOW_MENU_ON_START := false
 # ---- data nodes: CHILD nodes of ControlRoom, found automatically by group (names/order do not matter) ----
 var storm: StormSystem
 var clock: MissionClock
+var day_timer: Timer   # Game/Timers/DayTimer: its time_left is what the Environment monitor shows
 var components   # the Components object (components.gd) that the Game node owns; null when control_room.tscn runs on its own
 var sensors := {}            # sensor id -> Sensor ("power", "oxygen", "panels", "radiation", "perchlorate" ...)
 
@@ -167,6 +168,9 @@ func _process(delta: float) -> void:
 func _find_nodes() -> void:
 	storm = get_tree().get_first_node_in_group("storm") as StormSystem
 	clock = get_tree().get_first_node_in_group("clock") as MissionClock
+	day_timer = get_node_or_null("../Timers/DayTimer") as Timer
+	if day_timer == null:
+		push_warning("ControlRoom: Game/Timers/DayTimer not found, the Environment monitor timer will stay at 0:00.")
 	components = _find_components()
 	for n in get_tree().get_nodes_in_group("sensors"):
 		var sen := n as Sensor
@@ -307,8 +311,13 @@ func _push_screens() -> void:
 	if env != null:
 		for id in env.rows.keys():
 			env.set_value(id, _val(id))
-		if clock != null:
-			env.set_time(clock.clock_s)
+		# while the timer is not running (e.g. waiting for the API) show a full day (5:00) instead of 0:00
+		if day_timer == null:
+			env.set_day_time(300.0)
+		elif day_timer.is_stopped():
+			env.set_day_time(day_timer.wait_time)
+		else:
+			env.set_day_time(day_timer.time_left)
 	var al := _alerts_screen
 	if al != null:
 		al.set_warnings(_warnings)
