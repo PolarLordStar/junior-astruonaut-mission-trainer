@@ -10,6 +10,7 @@ var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var _env_screen: EnvironmentScreen = $ControlRoom/EnvironmentViewport/EnvironmentScreen
 @onready var storm_system: StormSystem = $ControlRoom/StormSystem
 @onready var _room = $ControlRoom
+var loading_screen := LoadingScreen.new()
 
 var day_number: int = save_script.load_day()
 var date
@@ -50,12 +51,14 @@ func setup() -> void:
 	# Other
 	$Timers/DayTimer.start()
 	$Timers/TickUpdateTimer.start()
+	await loading_screen.hide_loading()
+	day_counter.show_day(day_number)
 
 
 # START OR NEXT DAY FUNCTIONS
 func start() -> void:
+	loading_screen.show_loading()
 	setup()
-	day_counter.show_day(day_number)
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
@@ -73,6 +76,8 @@ func _on_transition_main_menu() -> void:
 	get_tree().change_scene_to_file("res://main_menu.tscn")
 
 func _ready() -> void:
+	add_child(loading_screen)
+	day_transition.continue_pressed.connect(_on_transition_continue)
 	day_transition.continue_pressed.connect(_on_transition_continue)
 	day_transition.main_menu_pressed.connect(_on_transition_main_menu)
 	_status_screen.show_power()
@@ -127,6 +132,7 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	# 1. Move the event from events_to_occur to events_occurring
 	components_scene.events_to_occur.erase(event_dict)
 	components_scene.events_occurring[event_dict] = duration
+	components_scene.update_occurring_flags()
 	update_event_visuals()
 	print("Event started: ", event_dict, " | Ends in: ", duration, "s")
 	
@@ -148,6 +154,7 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> void:
 	# Remove the expired event from events_occurring
 	components_scene.events_occurring.erase(event_dict)
+	components_scene.update_occurring_flags()
 	update_event_visuals()
 	print("Event ended: ", event_dict)
 	
