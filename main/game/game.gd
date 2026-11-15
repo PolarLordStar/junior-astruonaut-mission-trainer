@@ -9,14 +9,25 @@ var day_number: int = save_script.load_day()
 var date
 
 func setup() -> void:
-	# Resetting Components
-	update_components()
+	# Resetting Values
+	player_script.health = preset_values.MAX_HEALTH
+	components_script.Radiation = preset_values.RADIATION
+	components_script.Power = preset_values.POWER
+	components_script.Oxygen = preset_values.OXYGEN
+	components_script.ToxicPerch = preset_values.TOXIC_PERCH
+	components_script.SolarPanels = preset_values.SOLAR_PANELS
+	
+	day_number += 1
+	date = await DonkiService.fetch_random_day()
+	
+	# Enabling Day-Dependent Components
+	update_day_by_day_components()
 	
 	# Events
 	components_script.events_for_today = {}
 	components_script.events_to_occur = {}
 	components_script.events_occurring = {}
-	components_script.decide_events(date, day_number)
+	components_script.decide_events(date)
 	start_event_timers()
 	
 	# Other
@@ -92,19 +103,7 @@ func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> voi
 
 
 # COMPONENTS
-func update_components() -> void:
-	player_script.health = preset_values.MAX_HEALTH
-	components_script.Radiation = preset_values.RADIATION
-	components_script.Power = preset_values.POWER
-	components_script.Oxygen = preset_values.OXYGEN
-	components_script.ToxicPerch = preset_values.TOXIC_PERCH
-	components_script.SolarPanels = preset_values.SOLAR_PANELS
-	
-	# Resetting Values
-	day_number += 1
-	date = await DonkiService.fetch_random_day()
-	
-	# Enabling Day-Dependent Components
+func update_day_by_day_components() -> void:
 	match day_number:
 		1:
 			components_script.PowerEnabled = true
@@ -116,9 +115,9 @@ func update_components() -> void:
 			components_script.SlowStormsEnabled = false
 			components_script.FastStormsEnabled = false
 			
-			components_script.RadiationShielding = true
-			components_script.AirFiltering = false
-			components_script.CoverSolarPan = false
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = false
+			components_script.CoverSolarPanEnabled = false
 		
 		2:
 			components_script.PowerEnabled = true
@@ -130,9 +129,9 @@ func update_components() -> void:
 			components_script.SlowStormsEnabled = false
 			components_script.FastStormsEnabled = false
 			
-			components_script.RadiationShielding = true
-			components_script.AirFiltering = true
-			components_script.CoverSolarPan = false
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = false
 		
 		3:
 			components_script.PowerEnabled = true
@@ -144,9 +143,9 @@ func update_components() -> void:
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true
 			
-			components_script.RadiationShielding = true
-			components_script.AirFiltering = true
-			components_script.CoverSolarPan = true
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
 		
 		4:
 			components_script.PowerEnabled = true
@@ -158,9 +157,9 @@ func update_components() -> void:
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true
 			
-			components_script.RadiationShielding = true
-			components_script.AirFiltering = true
-			components_script.CoverSolarPan = true
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
 		
 		5:
 			components_script.PowerEnabled = true
@@ -172,9 +171,9 @@ func update_components() -> void:
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true
 			
-			components_script.RadiationShielding = true
-			components_script.AirFiltering = true
-			components_script.CoverSolarPan = true
+			components_script.RadiationShieldingEnabled = true
+			components_script.AirFilteringEnabled = true
+			components_script.CoverSolarPanEnabled = true
 
 func _updating_tick() -> void:
 	components_script.tick_update()

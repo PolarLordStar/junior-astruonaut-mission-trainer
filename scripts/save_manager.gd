@@ -23,7 +23,7 @@ const SAVE_PATH := "user://save.cfg"
 const SECTION := "progress"
 
 ## The day a brand-new game (no save file) starts on.
-const DEFAULT_DAY := 0
+const DEFAULT_DAY := 1
 
 ## Turn off to only SAVE the day without ever loading it back into the game.
 const RESTORE_ON_LOAD := true

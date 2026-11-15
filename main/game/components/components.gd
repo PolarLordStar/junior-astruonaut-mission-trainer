@@ -2,11 +2,11 @@ extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 
 # Variables for bars and stuff
-var Radiation = 0
-var Power = 0
-var Oxygen = 0
-var ToxicPerch = 0
-var SolarPanels = 0
+var Radiation: int = 0
+var Power: int = 0
+var Oxygen: int = 0
+var ToxicPerch: int = 0
+var SolarPanels: int = 0
 
 # Events
 var events_for_today = {} # {event : severity}
@@ -14,9 +14,12 @@ var events_to_occur = {} # {event : severity} : timer after which it occurs
 var events_occurring = {} # {event : severity} : time until it ends
 
 # User actions
-var RadiationShielding = false
-var CoverSolarPan = false
-var AirFiltering = false
+var RadiationShieldingEnabled = false
+var CoverSolarPanEnabled = false
+var AirFilteringEnabled = false
+var RadiationShieldingUsing = false
+var CoverSolarPanUsing = false
+var AirFilteringUsing = false
 
 # Variables which check stuff
 var PowerEnabled = false
@@ -29,7 +32,7 @@ var SlowStormsEnabled = false
 var FastStormsEnabled = false
 
 
-func decide_events(date, day_number: int) -> void:
+func decide_events(date) -> void:
 	# Deciding Events for Today
 	if RadiationEnabled:
 		for event in date["events"]:
