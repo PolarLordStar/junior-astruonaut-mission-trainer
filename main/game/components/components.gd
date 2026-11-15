@@ -1,4 +1,3 @@
-class_name Components
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 
@@ -8,38 +7,38 @@ const SLOW_STORMS = ["Electrostatic Dust Accumulation", "Regional Dust Front"]
 const FAST_STORMS = ["High-Velocity Dust Devil", "Global Regolith Blitz"]
 
 # Variables for bars and stuff
-var Radiation: int = 0
-var Power: int = 0
-var Oxygen: int = 0
-var ToxicPerch: int = 0
-var SolarPanels: int = 0
+@export var Radiation: int = 0
+@export var Power: int = 0
+@export var Oxygen: int = 0
+@export var ToxicPerch: int = 0
+@export var SolarPanels: int = 0
 
 # Events
-var events_for_today = {} # {event : severity}
-var events_to_occur = {} # {event : severity} : timer after which it occurs
-var events_occurring = {} # {event : severity} : time until it ends
+@export var events_for_today = {} # {event : severity}
+@export var events_to_occur = {} # {event : severity} : timer after which it occurs
+@export var events_occurring = {} # {event : severity} : time until it ends
 
-var SolarEventOccurring = false
+@export var SolarEventOccurring = false
 enum STORMS {NONE, SLOW, FAST}
-var StormOccurring = STORMS.NONE
+@export var StormOccurring = STORMS.NONE
 
 # User actions
-var RadiationShieldingEnabled = false
-var CoverSolarPanEnabled = false
-var AirFilteringEnabled = false
-var RadiationShieldingUsing = false
-var CoverSolarPanUsing = false
-var AirFilteringUsing = false
+@export var RadiationShieldingEnabled = false
+@export var CoverSolarPanEnabled = false
+@export var AirFilteringEnabled = false
+@export var RadiationShieldingUsing = false
+@export var CoverSolarPanUsing = false
+@export var AirFilteringUsing = false
 
 # Variables which check stuff
-var PowerEnabled = false
-var RadiationEnabled = false
-var OxygenEnabled = false
-var ToxicPerchEnabled = false
-var SolarPanEnabled = false
-var StormsEnabled = false
-var SlowStormsEnabled = false
-var FastStormsEnabled = false
+@export var PowerEnabled = false
+@export var RadiationEnabled = false
+@export var OxygenEnabled = false
+@export var ToxicPerchEnabled = false
+@export var SolarPanEnabled = false
+@export var StormsEnabled = false
+@export var SlowStormsEnabled = false
+@export var FastStormsEnabled = false
 
 
 func decide_events(date) -> void:

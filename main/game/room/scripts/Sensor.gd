@@ -5,11 +5,11 @@ extends Node
 ## RadiationSensor, OxygenSensor, PerchlorateSensor, PowerSensor, SolarPanelsSensor (or your own).
 ##
 ## In the real game a sensor takes its number from the Components object that the Game node owns
-## (Game.components_script, see main/game/components/components.gd): Radiation, Power, Oxygen,
+## (the "Components" child node of Game, see main/game/components/components.gd): Radiation, Power, Oxygen,
 ## ToxicPerch and SolarPanels. That is the game state, so the monitors always show what Components
 ## holds. Components values run from 0 up to their MAX in main/libraries/preset_values.gd; each
 ## sensor converts that to its own range below. The sensor finds Components by itself (it looks
-## through its parents for a node that has "components_script"), so nothing has to be wired up.
+## through its parents for a node that has a child named "Components"), so nothing has to be wired up.
 ##
 ## Otherwise (no Game around, e.g. you run control_room.tscn on its own, or "Use Components" is off)
 ## there are three ways a sensor gets its number:
@@ -50,7 +50,7 @@ const PRESET := preload("res://main/libraries/preset_values.gd")
 
 var value := 0.0
 var _data_t := 0.0
-var components   # the Components object (components.gd) that Game owns; null when there is no Game
+var components   # the Components node (components.gd) that is a child of Game; null when there is no Game
 
 
 ## Registered here (not in _init) so it always happens, whatever the child scripts do in their own _init.
@@ -76,12 +76,12 @@ func _process(delta: float) -> void:
 		set_value(data[i])
 
 
-## Looks up through the parents for the node that owns the Components (the Game node).
+## Looks up through the parents for the node that has a child named "Components" (the Game node) and returns that Components node.
 func _find_components():
 	var n := get_parent()
 	while n != null:
-		if "components_script" in n:
-			return n.components_script
+		if n.has_node("Components"):
+			return n.get_node("Components")
 		n = n.get_parent()
 	return null
 

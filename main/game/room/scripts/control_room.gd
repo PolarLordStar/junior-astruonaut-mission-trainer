@@ -56,7 +56,7 @@ const SHOW_MENU_ON_START := false
 var storm: StormSystem
 var clock: MissionClock
 var day_timer: Timer   # Game/Timers/DayTimer: its time_left is what the Environment monitor shows
-var components   # the Components object (components.gd) that the Game node owns; null when control_room.tscn runs on its own
+var components   # the Components node (components.gd), a child of Game; null when control_room.tscn runs on its own
 var sensors := {}            # sensor id -> Sensor ("power", "oxygen", "panels", "radiation", "perchlorate" ...)
 
 # read-only shortcuts so the visual code below keeps working with the old names
@@ -249,15 +249,26 @@ func _exit_tree() -> void:
 # Each desk button calls ONE of these when it is clicked. They are EMPTY on purpose:
 # put your code inside them (GDScript needs "pass" in an empty function, delete it when you add code).
 func radiation_shielding() -> void:
-	pass
-
+	if components != null:
+		if components.RadiationShieldingUsing:
+				components.RadiationShieldingUsing = false
+		else:
+				components.RadiationShieldingUsing = true
 
 func air_filtering() -> void:
-	pass
+	if components != null:
+			if components.AirFilteringUsing:
+					components.AirFilteringUsing = false
+			else:
+					components.AirFilteringUsing = true
 
 
 func covering_solar_panels() -> void:
-	pass
+	if components != null:
+			if components.CoverSolarPanUsing:
+					components.CoverSolarPanUsing = false
+			else:
+					components.CoverSolarPanUsing = true
 
 
 # ---------- storm visuals ----------
@@ -323,12 +334,12 @@ func _push_screens() -> void:
 		al.set_warnings(_warnings)
 
 
-## Looks up through the parents for the node that owns the Components (the Game node).
+## Looks up through the parents for the node that has a child named "Components" (the Game node) and returns that Components node.
 func _find_components():
 	var n := get_parent()
 	while n != null:
-		if "components_script" in n:
-			return n.components_script
+		if n.has_node("Components"):
+			return n.get_node("Components")
 		n = n.get_parent()
 	return null
 
