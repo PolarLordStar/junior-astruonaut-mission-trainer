@@ -1,5 +1,6 @@
 class_name PerchlorateSensor
 extends Sensor
+## In the game its value is Components.ToxicPerch (0 .. MAX_TOXIC_PERCH), converted to this sensor's range.
 ## Toxic perchlorate in the cabin air (Environment monitor). Rises during dust storms.
 ## FOR NASA DATA: change the numbers below, and/or fill the "Data" array in the Inspector.
 
@@ -39,6 +40,10 @@ func _init() -> void:
 
 func _ready() -> void:
 	_storm = get_tree().get_first_node_in_group("storm") as StormSystem
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.ToxicPerch, PRESET.MAX_TOXIC_PERCH))
 
 
 func _simulate(delta: float) -> void:

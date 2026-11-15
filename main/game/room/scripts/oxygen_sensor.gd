@@ -1,5 +1,6 @@
 class_name OxygenSensor
 extends Sensor
+## In the game its value is Components.Oxygen (0 .. MAX_OXYGEN), converted to this sensor's range.
 ## Oxygen level. ONE node feeds BOTH the Environment monitor ("oxygen level" row) and the
 ## Life Support monitor ("oxygen supply" bar). Drains faster when power is low; a reserve tank
 ## refills it when it runs out.
@@ -44,6 +45,10 @@ func _ready() -> void:
 
 func detail() -> String:
 	return "%d%% remaining" % roundi(value)
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.Oxygen, PRESET.MAX_OXYGEN))
 
 
 func _simulate(delta: float) -> void:
