@@ -20,11 +20,13 @@ var AirFiltering = false
 
 # Variables which check stuff
 var PowerEnabled = false
-var RadiationEnabled = true
+var RadiationEnabled = false
 var OxygenEnabled = false
 var ToxicPerchEnabled = false
 var SolarPanEnabled = false
-var StormsEnabled = true
+var StormsEnabled = false
+var SlowStormsEnabled = false
+var FastStormsEnabled = false
 
 
 func decide_events(date, day_number: int) -> void:
@@ -35,7 +37,7 @@ func decide_events(date, day_number: int) -> void:
 			events_for_today[event["name"]] = event["severity"]
 	
 	if StormsEnabled:	
-		var storms = StormGenerator.generate(day_number)
+		var storms = StormGenerator.generate(SlowStormsEnabled, FastStormsEnabled)
 		for storm in storms:
 			events_for_today[storm] = storms[storm]
 	
