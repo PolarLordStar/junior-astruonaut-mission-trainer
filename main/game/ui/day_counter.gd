@@ -44,6 +44,8 @@ func _process(_delta: float) -> void:
 
 ## DAY COUNTER: renders "DAY n" at the top of the screen, then slowly fades it away.
 func show_day(day: int) -> void:
+	if not is_node_ready():
+		await ready
 	_label.text = "DAY %d" % day
 	if _tween != null and _tween.is_valid():
 		_tween.kill()

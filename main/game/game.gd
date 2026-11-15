@@ -1,10 +1,11 @@
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 var player_script = preload("res://main/game/player/player.gd").new()
-var save_script = preload("res://scripts/save_manager.gd")
+var save_script = preload("res://scripts/save_manager.gd").new()
 var components_script = preload("res://main/game/components/components.gd").new()
+@onready var day_counter: CanvasLayer = $DayCounter
 
-var day_number: int = save_script.new().load_day()
+var day_number: int = save_script.load_day()
 var date
 
 func setup() -> void:
@@ -26,11 +27,13 @@ func setup() -> void:
 
 # START OR NEXT DAY FUNCTIONS
 func start() -> void:
-	# ...screen saying Day Number
 	setup()
+	day_counter.show_day(day_number)
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
+	if day_number < preset_values.MAX_DAYS:
+		start()
 	# ...screen saying day number survived
 func _ready() -> void:
 	start()
