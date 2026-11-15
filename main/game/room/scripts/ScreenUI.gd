@@ -77,3 +77,22 @@ func _process(_delta: float) -> void:
 			working += 1
 	count_label.text = str(working)
 	_circle_style.bg_color = count_color(working)
+
+
+# FOR DISABLING AND ENABLING COMPONENTS
+func show_power() -> void:   power_meter.show()
+func hide_power() -> void:   power_meter.hide()
+
+func show_oxygen() -> void:  oxygen_meter.show()
+func hide_oxygen() -> void:  oxygen_meter.hide()
+
+func show_solar_panels() -> void:
+	$Margin/Layout/PanelsHeader.show()
+	$Margin/Layout/PanelsRow.show()
+func hide_solar_panels() -> void:
+	$Margin/Layout/PanelsHeader.hide()
+	$Margin/Layout/PanelsRow.hide()
+
+func _ready() -> void:
+	power_meter.name_label.text = "POWER SUPPLY"
+	oxygen_meter.name_label.text = "OXYGEN SUPPLY"
