@@ -1,8 +1,8 @@
 class_name StatRow
 extends PanelContainer
 ## One line on the Environment monitor: name, a big percentage, a bar and a little history graph.
-## Everything shown is a percentage (100 % = all good), coloured like the Life Support bars:
-## green 70 % and up, amber 50-69 %, red below 50 %.
+## The number, bar and graph show the reading as a share of its range (Components value 100 = 100 %,
+## 0 = 0 %). The COLOUR still says how good it is: green = fine, amber = warning, red = danger.
 ## All the nodes are in room/stat_row.tscn, so you can restyle, move or hide any part in the editor.
 ## EnvironmentScreen makes one instance of that scene per sensor (EnvironmentScreen.add_row({...}))
 ## and feeds it with set_value(). Colours switch automatically: green = normal, amber = warn, red = danger.
@@ -32,7 +32,8 @@ var danger_at := INF     # high-is-bad: red above this.    low-is-bad: red below
 var low_is_bad := false
 var decimals := 0
 var value := 0.0         # raw reading
-var percent := 100.0     # what is shown
+var percent := 100.0     # "how good is it" (100 = perfect), only used for the colours
+var shown := 0.0         # the reading as a share of its range (0 .. 100): what the label, bar and graph display
 
 @onready var name_label: Label = %NameLabel
 @onready var value_label: Label = %ValueLabel
@@ -69,8 +70,10 @@ func setup(cfg: Dictionary) -> void:
 	spark.min_v = 0.0
 	spark.max_v = 100.0
 	spark.marks.clear()
-	spark.marks.append(70.0)
-	spark.marks.append(50.0)
+	if is_finite(warn_at):
+		spark.marks.append(to_shown(warn_at))
+	if is_finite(danger_at):
+		spark.marks.append(to_shown(danger_at))
 	set_value(max_value if low_is_bad else min_value)
 
 
@@ -101,6 +104,14 @@ func to_percent(v: float) -> float:
 	return clampf(pct, 0.0, 100.0)
 
 
+## The raw reading as a straight share of the sensor's range: min_value = 0 %, max_value = 100 %.
+func to_shown(v: float) -> float:
+	var span := max_value - min_value
+	if span <= 0.0:
+		return 0.0
+	return clampf((v - min_value) / span * 100.0, 0.0, 100.0)
+
+
 ## 0 = normal (green), 1 = warn (amber), 2 = danger (red)
 func level() -> int:
 	if percent < 50.0:
@@ -117,10 +128,11 @@ func level_color() -> Color:
 func set_value(v: float) -> void:
 	value = v
 	percent = to_percent(v)
+	shown = to_shown(v)
 	if value_label == null:
 		return
-	value_label.text = "%d%%" % roundi(percent)
-	bar.value = percent
+	value_label.text = "%d%%" % roundi(shown)
+	bar.value = shown
 	var col := level_color()
 	_fill.bg_color = col
 	_card_style.border_color = col
@@ -133,7 +145,7 @@ func _process(delta: float) -> void:
 	_hist_t += delta
 	if _hist_t >= 0.5 and spark != null:
 		_hist_t = 0.0
-		spark.push(percent)
+		spark.push(shown)
 	if _card_style != null:
 		var flash := level() == 2 and sin(_t * 6.0) > -0.3
 		_card_style.bg_color = CARD.lerp(RED, 0.14) if flash else CARD
