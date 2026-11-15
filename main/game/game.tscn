@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://buikqrfnwyarc" path="res://main/game/game.gd" id="1_3epdo"]
 [ext_resource type="PackedScene" uid="uid://crroo36paioj6" path="res://main/game/room/control_room.tscn" id="2_5mlo5"]
+[ext_resource type="PackedScene" uid="uid://x0mt4djj6vod" path="res://main/game/ui/day_counter.tscn" id="3_daycounter"]
+[ext_resource type="PackedScene" path="res://main/game/ui/day_transition.tscn" id="4_daytransition"]
 [ext_resource type="PackedScene" uid="uid://cj6kmyru4uqrm" path="res://main/game/components/components.tscn" id="2_gpuo4"]
 [ext_resource type="PackedScene" uid="uid://x0mt4djj6vod" path="res://main/game/ui/day_counter.tscn" id="3_daycounter"]
 
@@ -22,5 +24,9 @@ one_shot = true
 
 [node name="DayCounter" parent="." unique_id=1010252669 instance=ExtResource("3_daycounter")]
 
+[node name="DayTransition" parent="." instance=ExtResource("4_daytransition")]
+
 [connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
 [connection signal="timeout" from="Timers/TickUpdateTimer" to="." method="_updating_tick"]
+[connection signal="continue_pressed" from="DayTransition" to="." method="_on_transition_continue"]
+[connection signal="main_menu_pressed" from="DayTransition" to="." method="_on_transition_main_menu"]

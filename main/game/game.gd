@@ -53,9 +53,26 @@ func start() -> void:
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
-	if day_number < preset_values.MAX_DAYS:
-		start()
-	# ...screen saying day number survived
+	# The day is over: freeze the game and show the transition screen. It does NOT start the next day by
+	# itself any more, the player chooses with the two buttons (see the two functions below).
+	# On the last day there is no next day, so the Continue button is hidden.
+	get_tree().paused = true
+	day_transition.show_transition(day_number < preset_values.MAX_DAYS)
+
+
+# "Continue" on the transition screen: reset the day timer and start the next day.
+func _on_transition_continue() -> void:
+	$Timers/DayTimer.wait_time = preset_values.DAY_DURATION   # the day timer's original value again
+	get_tree().paused = false
+	start()   # setup() restarts DayTimer + TickUpdateTimer, and the day counter shows the new day number
+
+
+# "Return to Main Menu" on the transition screen.
+func _on_transition_main_menu() -> void:
+	get_tree().paused = false   # undo the pause from _on_day_end() first
+	get_tree().change_scene_to_file("res://main_menu.tscn")
+
+
 func _ready() -> void:
 	player_script.hurt.connect(_on_player_hurt)
 	player_script.died.connect(_on_player_died)
