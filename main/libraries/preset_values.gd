@@ -41,7 +41,7 @@ const RADIATION_SOLAR_EVENT_INCREASES := {
 	"Small Sun Flash": 3,
 	"Medium Sun Flash": 4,
 	"Giant Sun Flash": 4,
-	"Solar Event Incoming": 3,
+	"Solar Cloud": 3,
 	"Radiation Storm": 5,
 }
 const CRITICAL_RADIATION: int = 90 # decreases health above or equal

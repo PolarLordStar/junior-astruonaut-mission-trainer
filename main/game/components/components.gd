@@ -3,7 +3,7 @@ var preset_values = preload("res://main/libraries/preset_values.gd").new()
 @onready var health_scene = get_parent().get_node("Health")
 
 const SOLAR_EVENTS = ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash",
-	"Giant Sun Flash", "Solar Event Incoming", "Radiation Storm"]
+	"Giant Sun Flash", "Solar Cloud", "Radiation Storm"]
 const SLOW_STORMS = ["Electrostatic Dust Accumulation", "Regional Dust Front"]
 const FAST_STORMS = ["High-Velocity Dust Devil", "Global Regolith Blitz"]
 
@@ -228,7 +228,7 @@ func update_occurring_flags() -> void:
 	SolarRadiationIncrease = 0
 
 	for event_dict in events_occurring:
-		var event_name: String = event_dict.keys()[0].trim_suffix("!")
+		var event_name: String = event_dict.keys()[0]
 		if event_name in FAST_STORMS:
 			StormOccurring = STORMS.FAST
 		elif event_name in SLOW_STORMS and StormOccurring != STORMS.FAST:

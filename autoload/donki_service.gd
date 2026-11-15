@@ -246,7 +246,7 @@ func _fetch(type: String, start: String, end: String) -> Array:
 func _convert(raw: Dictionary) -> Array:
 	var out: Array = []
 
-	var flare_names := ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash", "Giant Sun Flash!"]
+	var flare_names := ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash", "Giant Sun Flash"]
 	var severity_by_class := {"A": 0, "B": 0, "C": 1, "M": 2, "X": 3}
 
 	for f in raw.get("FLR", []):
@@ -268,7 +268,7 @@ func _convert(raw: Dictionary) -> Array:
 		out.append({
 			"id": _s(c.get("activityID", "")),
 			"kind": "cme",
-			"name": "Solar Event Incoming",
+			"name": "Solar Cloud",
 			"severity": 2,
 			"time": _s(c.get("startTime", "")),
 			"action": "Prepare the outpost",
@@ -281,7 +281,7 @@ func _convert(raw: Dictionary) -> Array:
 		out.append({
 			"id": _s(s.get("sepID", "")),
 			"kind": "sep",
-			"name": "Radiation Storm!",
+			"name": "Radiation Storm",
 			"severity": 3,
 			"time": _s(s.get("eventTime", "")),
 			"action": "Shelter in place now",
