@@ -49,6 +49,7 @@ func set_value(id: String, v: float) -> void:
 		r.set_value(v)
 
 
-func set_time(sol: int, clock_s: float) -> void:
+## Shows the time of day (HH:MM). The day itself runs on Game/Timers/DayTimer, see game.gd.
+func set_time(clock_s: float) -> void:
 	if clock_label != null:
-		clock_label.text = "SOL %03d · %02d:%02d" % [sol, int(clock_s / 3600.0), int(fmod(clock_s, 3600.0) / 60.0)]
+		clock_label.text = "%02d:%02d" % [int(clock_s / 3600.0), int(fmod(clock_s, 3600.0) / 60.0)]
