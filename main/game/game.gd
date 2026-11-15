@@ -55,6 +55,7 @@ func start() -> void:
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
+	save_script.save_day(day_number)
 	get_tree().paused = true
 	day_transition.show_transition(day_number < preset_values.MAX_DAYS)
 
