@@ -41,6 +41,7 @@ func setup() -> void:
 	components_scene.events_to_occur = {}
 	components_scene.events_occurring = {}
 	components_scene.SolarEventOccurring = false
+	components_scene.SolarRadiationIncrease = 0
 	components_scene.StormOccurring = components_scene.STORMS.NONE
 	storm_system.stop_storm()
 	components_scene.decide_events(date)

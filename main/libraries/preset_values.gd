@@ -38,7 +38,14 @@ const POWER_1SP_INCREASE: int = 1
 const SLOW_STORM_SP_DAMAGE_CHANCE: float = 0.025
 const FAST_STORM_SP_DAMAGE_CHANCE: float = 0.05
 const TOXIC_PERCH_STORM_INCREASE: int = 2
-const RADIATION_SOLAR_EVENT_INCREASE: int = 3
+const RADIATION_SOLAR_EVENT_INCREASES := {
+	"Tiny Sun Flash": 2,
+	"Small Sun Flash": 3,
+	"Medium Sun Flash": 4,
+	"Giant Sun Flash": 5,
+	"Solar Cloud Incoming": 3,
+	"Radiation Storm": 6,
+}
 const RADIATION_SHIELDING_RADIATION_DECREASE: int = 3
 const RADIATION_SHIELDING_POWER_DECREASE: int = 5
 const AIR_FILTERING_TP_DECREASE: int = 3

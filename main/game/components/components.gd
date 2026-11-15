@@ -19,6 +19,7 @@ const FAST_STORMS = ["High-Velocity Dust Devil", "Global Regolith Blitz"]
 @export var events_to_occur = {} # {event : severity} : timer after which it occurs
 @export var events_occurring = {} # {event : severity} : time until it ends
 
+@export var SolarRadiationIncrease: int = 0   # total radiation added per tick by the solar events happening right now
 @export var SolarEventOccurring = false
 enum STORMS {NONE, SLOW, FAST}
 @export var StormOccurring = STORMS.NONE
@@ -169,7 +170,7 @@ func tick_update() -> void:
 	
 	# Increase Radiation MASSIVELY if Solar Event
 	if RadiationEnabled and SolarEventOccurring:
-		Radiation += preset_values.RADIATION_SOLAR_EVENT_INCREASE
+		Radiation += SolarRadiationIncrease
 		if Radiation > 100:
 			Radiation = 100
 	
@@ -207,6 +208,7 @@ func tick_update() -> void:
 func update_occurring_flags() -> void:
 	StormOccurring = STORMS.NONE
 	SolarEventOccurring = false
+	SolarRadiationIncrease = 0
 
 	for event_dict in events_occurring:
 		var event_name: String = event_dict.keys()[0].trim_suffix("!")
@@ -216,3 +218,4 @@ func update_occurring_flags() -> void:
 			StormOccurring = STORMS.SLOW
 		elif event_name in SOLAR_EVENTS:
 			SolarEventOccurring = true
+			SolarRadiationIncrease += preset_values.RADIATION_SOLAR_EVENT_INCREASES.get(event_name, 0)
