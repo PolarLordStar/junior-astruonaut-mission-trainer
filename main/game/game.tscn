@@ -2,10 +2,13 @@
 
 [ext_resource type="Script" uid="uid://buikqrfnwyarc" path="res://main/game/game.gd" id="1_3epdo"]
 [ext_resource type="PackedScene" uid="uid://crroo36paioj6" path="res://main/game/room/control_room.tscn" id="2_5mlo5"]
+[ext_resource type="PackedScene" uid="uid://cj6kmyru4uqrm" path="res://main/game/components/components.tscn" id="2_gpuo4"]
 [ext_resource type="PackedScene" uid="uid://x0mt4djj6vod" path="res://main/game/ui/day_counter.tscn" id="3_daycounter"]
 
 [node name="Game" type="Node" unique_id=466476844]
 script = ExtResource("1_3epdo")
+
+[node name="Components" parent="." unique_id=331099847 instance=ExtResource("2_gpuo4")]
 
 [node name="Timers" type="Node" parent="." unique_id=956759653]
 
