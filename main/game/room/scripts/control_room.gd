@@ -194,9 +194,17 @@ func _on_restart() -> void:
 	_menu.toast("Restart is not set up yet")
 
 
+## Same as the main-menu "Options": opens the Options screen on top of the pause menu.
 func _on_options() -> void:
-	# TODO: options screen (to be decided).
-	_menu.toast("Options are not set up yet")
+	if get_tree().get_first_node_in_group("options_menu") != null:
+		return   # already open
+	_menu.visible = false   # hide the game menu while Options is open (the tree stays paused)
+	var options := OptionsMenu.new()
+	# when Options closes, bring the game menu back (open() shows it again and focuses Continue)
+	options.tree_exited.connect(func():
+		if is_instance_valid(_menu) and _menu.is_inside_tree():
+			_menu.open())
+	get_tree().current_scene.add_child(options)
 
 
 func _on_main_menu() -> void:
