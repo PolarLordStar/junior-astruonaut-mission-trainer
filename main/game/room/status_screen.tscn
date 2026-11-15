@@ -76,13 +76,6 @@ theme_override_colors/font_color = Color(0.3686, 0.8784, 0.9412, 1)
 theme_override_font_sizes/font_size = 26
 text = "LIFE SUPPORT"
 
-[node name="ClockLabel" type="Label" parent="Margin/Layout/Header"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
-theme_override_font_sizes/font_size = 22
-text = "SOL 000 · 00:00"
-
 [node name="PowerMeter" parent="Margin/Layout" instance=ExtResource("2_meter")]
 unique_name_in_owner = true
 layout_mode = 2

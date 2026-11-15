@@ -12,7 +12,7 @@ extends Control
 ##   ├ Background (ColorRect)
 ##   ├ Margin
 ##   │ └ Layout (VBox)
-##   │   ├ Header (HBox): TitleLabel, ClockLabel
+##   │   ├ Header (HBox): TitleLabel
 ##   │   ├ PowerMeter   (StatusMeter instance, room/status_meter.tscn)
 ##   │   ├ OxygenMeter  (StatusMeter instance)
 ##   │   ├ PanelsHeader (HBox): PanelsTitle
@@ -37,10 +37,7 @@ const RED := Color("ff5a4a")
 var power := 100.0
 var oxygen := 100.0
 var panels: Array[bool] = [true, true, true, true, true, true]   # true = that solar panel works
-var sol := 1
-var clock_s := 0.0
 
-@onready var clock_label: Label = %ClockLabel
 @onready var power_meter: StatusMeter = %PowerMeter
 @onready var oxygen_meter: StatusMeter = %OxygenMeter
 @onready var count_circle: Panel = %CountCircle
@@ -70,7 +67,6 @@ static func count_color(working: int) -> Color:
 
 
 func _process(_delta: float) -> void:
-	clock_label.text = "SOL %03d · %02d:%02d" % [sol, int(clock_s / 3600.0), int(fmod(clock_s, 3600.0) / 60.0)]
 	power_meter.set_value(power)
 	oxygen_meter.set_value(oxygen)
 	var working := 0

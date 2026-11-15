@@ -55,7 +55,8 @@ const SHOW_MENU_ON_START := false
 # ---- data nodes: CHILD nodes of ControlRoom, found automatically by group (names/order do not matter) ----
 var storm: StormSystem
 var clock: MissionClock
-var components   # the Components object (components.gd) that the Game node owns; null when control_room.tscn runs on its own
+var day_timer: Timer   # Game/Timers/DayTimer: its time_left is what the Environment monitor shows
+var components   # the Components node (components.gd), a child of Game; null when control_room.tscn runs on its own
 var sensors := {}            # sensor id -> Sensor ("power", "oxygen", "panels", "radiation", "perchlorate" ...)
 
 # read-only shortcuts so the visual code below keeps working with the old names
@@ -167,6 +168,9 @@ func _process(delta: float) -> void:
 func _find_nodes() -> void:
 	storm = get_tree().get_first_node_in_group("storm") as StormSystem
 	clock = get_tree().get_first_node_in_group("clock") as MissionClock
+	day_timer = get_node_or_null("../Timers/DayTimer") as Timer
+	if day_timer == null:
+		push_warning("ControlRoom: Game/Timers/DayTimer not found, the Environment monitor timer will stay at 0:00.")
 	components = _find_components()
 	for n in get_tree().get_nodes_in_group("sensors"):
 		var sen := n as Sensor
@@ -245,15 +249,26 @@ func _exit_tree() -> void:
 # Each desk button calls ONE of these when it is clicked. They are EMPTY on purpose:
 # put your code inside them (GDScript needs "pass" in an empty function, delete it when you add code).
 func radiation_shielding() -> void:
-	pass
-
+	if components != null:
+		if components.RadiationShieldingUsing:
+				components.RadiationShieldingUsing = false
+		else:
+				components.RadiationShieldingUsing = true
 
 func air_filtering() -> void:
-	pass
+	if components != null:
+			if components.AirFilteringUsing:
+					components.AirFilteringUsing = false
+			else:
+					components.AirFilteringUsing = true
 
 
 func covering_solar_panels() -> void:
-	pass
+	if components != null:
+			if components.CoverSolarPanUsing:
+					components.CoverSolarPanUsing = false
+			else:
+					components.CoverSolarPanUsing = true
 
 
 # ---------- storm visuals ----------
@@ -303,26 +318,28 @@ func _push_screens() -> void:
 		var sp := sensors.get("panels") as SolarPanelsSensor
 		if sp != null:
 			st.panels = sp.panels
-		if clock != null:
-			st.sol = clock.sol
-			st.clock_s = clock.clock_s
 	var env := _env_screen
 	if env != null:
 		for id in env.rows.keys():
 			env.set_value(id, _val(id))
-		if clock != null:
-			env.set_time(clock.sol, clock.clock_s)
+		# while the timer is not running (e.g. waiting for the API) show a full day (5:00) instead of 0:00
+		if day_timer == null:
+			env.set_day_time(300.0)
+		elif day_timer.is_stopped():
+			env.set_day_time(day_timer.wait_time)
+		else:
+			env.set_day_time(day_timer.time_left)
 	var al := _alerts_screen
 	if al != null:
 		al.set_warnings(_warnings)
 
 
-## Looks up through the parents for the node that owns the Components (the Game node).
+## Looks up through the parents for the node that has a child named "Components" (the Game node) and returns that Components node.
 func _find_components():
 	var n := get_parent()
 	while n != null:
-		if "components_script" in n:
-			return n.components_script
+		if n.has_node("Components"):
+			return n.get_node("Components")
 		n = n.get_parent()
 	return null
 

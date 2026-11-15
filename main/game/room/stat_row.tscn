@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c0ouh7cn7645"]
 
 [ext_resource type="Script" uid="uid://cnha6p8b3bjyt" path="res://main/game/room/scripts/StatRow.gd" id="1_statrow"]
 [ext_resource type="Script" uid="uid://c8l6dn75u8ika" path="res://main/game/room/scripts/sparkline.gd" id="2_spark"]
@@ -7,65 +7,65 @@
 resource_local_to_scene = true
 bg_color = Color(0.0863, 0.1529, 0.2392, 1)
 border_width_left = 8
-border_color = Color(0.2902, 0.8706, 0.5020, 1)
+border_color = Color(0.2902, 0.8706, 0.502, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
 bg_color = Color(0.0588, 0.1059, 0.1686, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
 resource_local_to_scene = true
-bg_color = Color(0.2902, 0.8706, 0.5020, 1)
+bg_color = Color(0.2902, 0.8706, 0.502, 1)
 
-[node name="StatRow" type="PanelContainer"]
+[node name="StatRow" type="PanelContainer" unique_id=1031248506]
 custom_minimum_size = Vector2(0, 66)
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 script = ExtResource("1_statrow")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=26630382]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
-[node name="Layout" type="HBoxContainer" parent="Margin"]
+[node name="Layout" type="HBoxContainer" parent="Margin" unique_id=2109935287]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Left" type="VBoxContainer" parent="Margin/Layout"]
+[node name="Left" type="VBoxContainer" parent="Margin/Layout" unique_id=1407621487]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="NameLabel" type="Label" parent="Margin/Layout/Left"]
+[node name="NameLabel" type="Label" parent="Margin/Layout/Left" unique_id=1779411005]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_colors/font_color = Color(0.549, 0.5804, 0.7843, 1)
 theme_override_font_sizes/font_size = 20
 text = "NAME"
 
-[node name="ValueLine" type="HBoxContainer" parent="Margin/Layout/Left"]
+[node name="ValueLine" type="HBoxContainer" parent="Margin/Layout/Left" unique_id=754245160]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ValueLabel" type="Label" parent="Margin/Layout/Left/ValueLine"]
+[node name="ValueLabel" type="Label" parent="Margin/Layout/Left/ValueLine" unique_id=517351022]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2902, 0.8706, 0.5020, 1)
+theme_override_colors/font_color = Color(0.2902, 0.8706, 0.502, 1)
 theme_override_font_sizes/font_size = 30
 text = "--%"
 
-[node name="UnitLabel" type="Label" parent="Margin/Layout/Left/ValueLine"]
+[node name="UnitLabel" type="Label" parent="Margin/Layout/Left/ValueLine" unique_id=1793904933]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_colors/font_color = Color(0.5490, 0.5804, 0.7843, 1)
+theme_override_colors/font_color = Color(0.549, 0.5804, 0.7843, 1)
 theme_override_font_sizes/font_size = 20
 text = "%"
 
-[node name="Bar" type="ProgressBar" parent="Margin/Layout/Left"]
+[node name="Bar" type="ProgressBar" parent="Margin/Layout/Left" unique_id=1503753216]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
@@ -73,7 +73,7 @@ theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
 show_percentage = false
 
-[node name="Sparkline" type="Control" parent="Margin/Layout"]
+[node name="Sparkline" type="Control" parent="Margin/Layout" unique_id=1708484132]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
