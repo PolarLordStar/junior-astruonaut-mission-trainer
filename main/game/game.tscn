@@ -29,13 +29,13 @@ one_shot = true
 
 [node name="ControlRoom" parent="." unique_id=1901615750 instance=ExtResource("2_5mlo5")]
 
-[node name="LowHealthOverlay" parent="." instance=ExtResource("6_lowhp")]
+[node name="LowHealthOverlay" parent="." unique_id=165717080 instance=ExtResource("6_lowhp")]
 
 [node name="DayCounter" parent="." unique_id=1010252669 instance=ExtResource("3_daycounter")]
 
 [node name="DayTransition" parent="." unique_id=2083233202 instance=ExtResource("5_458dk")]
 
-[node name="DeathScreen" parent="." instance=ExtResource("7_death")]
+[node name="DeathScreen" parent="." unique_id=834395972 instance=ExtResource("7_death")]
 
 [connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
 [connection signal="timeout" from="Timers/TickUpdateTimer" to="." method="_updating_tick"]

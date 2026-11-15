@@ -40,9 +40,9 @@ const RADIATION_SOLAR_EVENT_INCREASES := {
 	"Tiny Sun Flash": 2,
 	"Small Sun Flash": 3,
 	"Medium Sun Flash": 4,
-	"Giant Sun Flash": 5,
-	"Solar Cloud Incoming": 3,
-	"Radiation Storm": 6,
+	"Giant Sun Flash": 4,
+	"Solar Event Incoming": 3,
+	"Radiation Storm": 5,
 }
 const CRITICAL_RADIATION: int = 90 # decreases health above or equal
 const RADIATION_DAMAGE_HEALTH: int = 5
@@ -58,3 +58,19 @@ const TOXIC_PERCH_STORM_INCREASE: int = 2
 const CRITICAL_TOXIC_PERCH: int = 90 # decreases health above or equal
 const TP_DAMAGE_HEALTH: int = 5
 const AIR_FILTERING_TP_DECREASE: int = 3
+
+
+# ====================================== HEALTH DAMAGE (lost every tick)
+# Radiation and toxic perchlorates: damage while the bar is ABOVE the level
+const DAMAGE_LEVEL_LOW: int = 35
+const DAMAGE_LEVEL_MEDIUM: int = 65
+const DAMAGE_LEVEL_HIGH: int = 90
+const DAMAGE_LOW: int = 1
+const DAMAGE_MEDIUM: int = 2
+const DAMAGE_HIGH: int = 5
+
+# Oxygen: damage while the bar is BELOW the level
+const OXYGEN_DAMAGE_LEVEL_LOW: int = 66
+const OXYGEN_DAMAGE_LEVEL_HIGH: int = 33
+const OXYGEN_DAMAGE_LOW: int = 1
+const OXYGEN_DAMAGE_HIGH: int = 2

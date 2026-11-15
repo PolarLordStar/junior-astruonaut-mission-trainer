@@ -3,7 +3,7 @@ var preset_values = preload("res://main/libraries/preset_values.gd").new()
 @onready var health_scene = get_parent().get_node("Health")
 
 const SOLAR_EVENTS = ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash",
-	"Giant Sun Flash", "Solar Cloud Incoming", "Radiation Storm"]
+	"Giant Sun Flash", "Solar Event Incoming", "Radiation Storm"]
 const SLOW_STORMS = ["Electrostatic Dust Accumulation", "Regional Dust Front"]
 const FAST_STORMS = ["High-Velocity Dust Devil", "Global Regolith Blitz"]
 
@@ -92,6 +92,32 @@ func update_event_timers(delta: float) -> void:
 		events_occurring[event] = maxf(0.0, events_occurring[event] - delta)
 
 
+# Health lost this tick for a bar that is bad when HIGH (radiation, toxic perchlorates)
+func _high_level_damage(value: int) -> int:
+	if value > preset_values.DAMAGE_LEVEL_HIGH:
+		return preset_values.DAMAGE_HIGH
+	if value > preset_values.DAMAGE_LEVEL_MEDIUM:
+		return preset_values.DAMAGE_MEDIUM
+	if value > preset_values.DAMAGE_LEVEL_LOW:
+		return preset_values.DAMAGE_LOW
+	return 0
+
+
+# Health lost this tick for oxygen (bad when LOW)
+func _oxygen_damage(value: int) -> int:
+	if value < preset_values.OXYGEN_DAMAGE_LEVEL_HIGH:
+		return preset_values.OXYGEN_DAMAGE_HIGH
+	if value < preset_values.OXYGEN_DAMAGE_LEVEL_LOW:
+		return preset_values.OXYGEN_DAMAGE_LOW
+	return 0
+
+
+func damage_player(amount: int) -> void:
+	if amount <= 0:
+		return
+	health_scene.Health = maxi(health_scene.Health - amount, 0)
+
+
 func tick_update() -> void:
 	# ================== INDIVIDUAL COMPONENTS
 	
@@ -101,27 +127,18 @@ func tick_update() -> void:
 		Radiation += preset_values.RADIATION_GCR_INCREASE
 		if Radiation > 100:
 			Radiation = 100
-		if Radiation >= preset_values.CRITICAL_RADIATION:
-			health_scene.Health -= preset_values.RADIATION_DAMAGE_HEALTH
-			if health_scene.Health < 0:
-				health_scene.Health = 0
+		damage_player(_high_level_damage(Radiation))
 	
 	# Low Oxygen Damages Health
 	if OxygenEnabled:
-		if Oxygen < preset_values.CRITICAL_OXYGEN:
-			health_scene.Health -= preset_values.LOW_OXYGEN_DAMAGE_HEALTH
-			if health_scene.Health < 0:
-				health_scene.Health = 0
+		damage_player(_oxygen_damage(Oxygen))
 	
 	# Toxic Perchlorates Increase AND High Damages Health
 	if ToxicPerchEnabled:
 		ToxicPerch += preset_values.TOXIC_PERCH_DUST_INCREASE
 		if ToxicPerch > 100:
 			ToxicPerch = 100
-		if ToxicPerch >= preset_values.CRITICAL_TOXIC_PERCH:
-			health_scene.Health -= preset_values.TP_DAMAGE_HEALTH
-			if health_scene.Health < 0:
-				health_scene.Health = 0
+		damage_player(_high_level_damage(ToxicPerch))
 	
 	
 	# ================== LINKED COMPONENTS
