@@ -31,6 +31,8 @@ func setup() -> void:
 	components_script.events_for_today = {}
 	components_script.events_to_occur = {}
 	components_script.events_occurring = {}
+	components_script.SolarEventOccurring = false
+	components_script.StormOccurring = components_script.STORMS.NONE
 	components_script.decide_events(date)
 	start_event_timers()
 	
@@ -82,6 +84,7 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	# 1. Move the event from events_to_occur to events_occurring
 	components_script.events_to_occur.erase(event_dict)
 	components_script.events_occurring[event_dict] = duration
+	components_script.update_occurring_flags()
 	print("Event started: ", event_dict, " | Ends in: ", duration, "s")
 	
 	# 2. Clean up the start delay timer
@@ -95,14 +98,21 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	
 	end_timer.timeout.connect(_on_event_duration_timeout.bind(event_dict, end_timer))
 	end_timer.start()
+	
+	
+
 
 func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> void:
 	# Remove the expired event from events_occurring
 	components_script.events_occurring.erase(event_dict)
+	components_script.update_occurring_flags()
 	print("Event ended: ", event_dict)
 	
 	# Clean up the duration timer node
 	end_timer.queue_free()
+	
+	
+	
 
 
 # COMPONENTS
