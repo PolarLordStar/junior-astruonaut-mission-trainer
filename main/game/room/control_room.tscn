@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://main/game/room/warnings_screen.tscn" id="11_4dslu"]
 [ext_resource type="Shader" uid="uid://bbun788rmf4n6" path="res://shaders/vignette.gdshader" id="12_i4jdc"]
 [ext_resource type="PackedScene" path="res://main/game/room/pause_menu.tscn" id="13_he2g7"]
+[ext_resource type="Script" path="res://main/game/room/scripts/ambience_player.gd" id="14_ambpl"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
@@ -121,6 +122,9 @@ mouse_filter = 2
 
 [node name="PauseMenu" parent="." unique_id=2144919856 instance=ExtResource("13_he2g7")]
 unique_name_in_owner = true
+
+[node name="AmbiencePlayer" type="AudioStreamPlayer" parent="."]
+script = ExtResource("14_ambpl")
 
 [connection signal="main_menu_pressed" from="PauseMenu" to="." method="_on_main_menu"]
 [connection signal="options_pressed" from="PauseMenu" to="." method="_on_options"]

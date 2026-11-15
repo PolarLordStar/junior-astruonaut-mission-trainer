@@ -21,6 +21,11 @@ func setup() -> void:
 	components_script.CoverSolarPanUsing = false
 	components_script.RadiationShieldingUsing = false
 	
+	# Control-room ambience (it is stopped when the player dies, so start it again for the new attempt)
+	var ambience := _get_ambience()
+	if ambience != null:
+		ambience.play_ambience()
+	
 	day_number += 1
 	date = await DonkiService.fetch_random_day()
 	
@@ -52,7 +57,25 @@ func _on_day_end() -> void:
 		start()
 	# ...screen saying day number survived
 func _ready() -> void:
+	player_script.hurt.connect(_on_player_hurt)
+	player_script.died.connect(_on_player_died)
 	start()
+
+
+# PLAYER SOUNDS (scripts/game_sounds.gd, room/scripts/ambience_player.gd)
+func _on_player_hurt() -> void:
+	GameSounds.play_hurt()
+
+
+func _on_player_died() -> void:
+	GameSounds.play_death()
+	var ambience := _get_ambience()
+	if ambience != null:
+		ambience.stop_ambience()   # the control room goes quiet when the player dies
+
+
+func _get_ambience() -> AmbiencePlayer:
+	return get_tree().get_first_node_in_group("ambience") as AmbiencePlayer
 
 
 # EVENTS
