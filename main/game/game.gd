@@ -47,7 +47,7 @@ func _ready() -> void:
 func start_event_timers() -> void:
 	# Clear any leftover event timers from the previous day
 	for child in $Timers.get_children():
-		if child.name != "DayTimer":
+		if child.name != "DayTimer" && child.name != "TickUpdateTimer":
 			child.queue_free()
 	
 	

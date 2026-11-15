@@ -1,5 +1,6 @@
 class_name PowerSensor
 extends Sensor
+## In the game its value is Components.Power (0 .. MAX_POWER), converted to this sensor's range.
 ## Power supply (Life Support monitor). Follows the solar panels; dust in the air blocks sunlight.
 ## FOR NASA DATA: change the numbers below, and/or fill the "Data" array in the Inspector.
 
@@ -40,6 +41,10 @@ func get_warning() -> Dictionary:
 		return {}
 	return {"id": id, "title": "LOW POWER", "detail": "%d%% available" % roundi(value),
 			"badge": "WARNING", "level": 2}
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.Power, PRESET.MAX_POWER))
 
 
 func _simulate(delta: float) -> void:

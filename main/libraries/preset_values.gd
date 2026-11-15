@@ -7,6 +7,7 @@ const HEALTH: int = 100
 # GAME SCRIPT
 const MAX_DAYS: int = 5
 const EVENT_DURATION: int = 60
+const DAY_DURATION: int = 300 # seconds (5 minutes)
 
 const MIN_EVENT_TIME: float = 0.0
 const MAX_EVENT_TIME: float = 300.0
