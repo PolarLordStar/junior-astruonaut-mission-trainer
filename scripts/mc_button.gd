@@ -36,6 +36,7 @@ func _ready() -> void:
 	add_theme_constant_override("outline_size", 3)
 	if ResourceLoader.exists(FONT_PATH):
 		add_theme_font_override("font", load(FONT_PATH) as Font)
+	pressed.connect(GameSounds.play_click)   # click sound for every menu button
 	pressed.connect(_on_pressed)
 	mouse_entered.connect(grab_focus)   # highlight follows the mouse
 
