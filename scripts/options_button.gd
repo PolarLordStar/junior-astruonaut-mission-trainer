@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name OptionsButton
 extends McButton
 ## "Options": opens the options screen (options_menu.gd), which can be closed again.

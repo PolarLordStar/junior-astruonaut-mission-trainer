@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name WarningCard
 extends PanelContainer
 ## One warning on the Warnings monitor: coloured side stripe, title, detail line and a severity badge.

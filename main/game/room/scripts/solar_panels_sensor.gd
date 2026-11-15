@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name SolarPanelsSensor
 extends Sensor
 ## In the game its value is Components.SolarPanels (0 .. MAX_SOLAR_PANELS), converted to this sensor's range.

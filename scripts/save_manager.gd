@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 ## Saves and loads the player's progress (for now: the current day number).
 ##

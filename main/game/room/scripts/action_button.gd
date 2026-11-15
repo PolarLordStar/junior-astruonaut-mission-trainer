@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name ActionButton
 extends Node3D
 ## A physical push-button on the control-room desk, built from code (no scene file needed).

@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name PresetValues
 extends Node
 

@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name MissionClock
 extends Node
 ## Mission day (sol) and time of day shown at the top of the monitors.

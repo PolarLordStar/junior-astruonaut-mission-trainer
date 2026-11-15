@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name WarningsScreen
 extends Control
 ## Right monitor: shows ONLY active warnings. With no warnings the whole screen is black.

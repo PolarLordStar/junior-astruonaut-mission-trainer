@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 @onready var health_scene = get_parent().get_node("Health")

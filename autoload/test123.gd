@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Node
 
 func _ready() -> void:

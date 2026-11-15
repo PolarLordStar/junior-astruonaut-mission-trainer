@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends Control
 ## Main menu. The little message under the buttons is the MessageLabel node in main_menu.tscn.
 ##

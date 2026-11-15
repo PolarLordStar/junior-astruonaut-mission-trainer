@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name EnvironmentScreen
 extends Control
 ## Middle monitor: environment stats. All the nodes are in room/environment_screen.tscn,

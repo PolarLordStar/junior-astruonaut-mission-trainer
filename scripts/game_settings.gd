@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name GameSettings
 extends RefCounted
 ## Settings the Options screen can change. Static variables keep their value while the game is

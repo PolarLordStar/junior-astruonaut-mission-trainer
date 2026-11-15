@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name McButton
 extends Button
 ## Shared look for the four main-menu buttons (same blocky style as pause_menu.gd).

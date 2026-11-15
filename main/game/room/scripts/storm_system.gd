@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name StormSystem
 extends Node
 ## Mars weather events (dust storm, solar flare, dust devil). Other sensors and the room visuals

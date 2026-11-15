@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name OxygenSensor
 extends Sensor
 ## In the game its value is Components.Oxygen (0 .. MAX_OXYGEN), converted to this sensor's range.

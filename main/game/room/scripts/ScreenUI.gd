@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name ScreenUI
 extends Control
 ## Left monitor ("Life Support"): power supply, oxygen supply and the 6 solar panels.

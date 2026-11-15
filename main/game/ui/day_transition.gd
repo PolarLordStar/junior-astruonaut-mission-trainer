@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 extends CanvasLayer
 ## Transition screen between the end of a day and the start of the next one.
 ##

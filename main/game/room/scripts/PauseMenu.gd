@@ -1,3 +1,4 @@
+# Some usage of AI occured in the script
 class_name PauseMenu
 extends CanvasLayer
 ## Minecraft-style pause menu. Esc opens and closes it and pauses the game.
