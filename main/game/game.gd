@@ -17,6 +17,10 @@ func setup() -> void:
 	components_script.ToxicPerch = preset_values.TOXIC_PERCH
 	components_script.SolarPanels = preset_values.SOLAR_PANELS
 	
+	components_script.AirFilteringUsing = false
+	components_script.CoverSolarPanUsing = false
+	components_script.RadiationShieldingUsing = false
+	
 	day_number += 1
 	date = await DonkiService.fetch_random_day()
 	
@@ -31,7 +35,6 @@ func setup() -> void:
 	start_event_timers()
 	
 	# Other
-	$Timers/DayTimer.wait_time = preset_values.DAY_DURATION
 	$Timers/DayTimer.start()
 	$Timers/TickUpdateTimer.start()
 
