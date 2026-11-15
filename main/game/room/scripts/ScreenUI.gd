@@ -92,3 +92,7 @@ func show_solar_panels() -> void:
 func hide_solar_panels() -> void:
 	$Margin/Layout/PanelsHeader.hide()
 	$Margin/Layout/PanelsRow.hide()
+
+func _ready() -> void:
+	power_meter.name_label.text = "POWER SUPPLY"
+	oxygen_meter.name_label.text = "OXYGEN SUPPLY"
