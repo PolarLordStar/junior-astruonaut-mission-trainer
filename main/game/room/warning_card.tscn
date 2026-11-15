@@ -24,6 +24,7 @@ theme_override_constants/margin_bottom = 6
 
 [node name="Layout" type="HBoxContainer" parent="Margin"]
 layout_mode = 2
+theme_override_constants/separation = 12
 
 [node name="Left" type="VBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
@@ -34,6 +35,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "WARNING TITLE"
+autowrap_mode = 3
 
 [node name="DetailLabel" type="Label" parent="Margin/Layout/Left"]
 unique_name_in_owner = true
