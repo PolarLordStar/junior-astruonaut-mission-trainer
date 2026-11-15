@@ -93,6 +93,8 @@ func _ready() -> void:
 
 ## True if the ray (from the camera through the mouse) passes over this button.
 func ray_hits(origin: Vector3, dir: Vector3) -> bool:
+	if not is_visible_in_tree():
+		return false
 	var centre := to_global(Vector3(0.0, REST_Y, 0.0))
 	var radius := HIT_R * global_transform.basis.get_scale().x   # the desk rig is scaled down
 	var t := (centre - origin).dot(dir)

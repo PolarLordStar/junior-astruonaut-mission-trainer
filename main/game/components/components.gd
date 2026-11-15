@@ -102,11 +102,15 @@ func tick_update() -> void:
 			Radiation = 100
 		if Radiation >= preset_values.CRITICAL_RADIATION:
 			health_scene.Health -= preset_values.RADIATION_DAMAGE_HEALTH
+			if health_scene.Health < 0:
+				health_scene.Health = 0
 	
 	# Low Oxygen Damages Health
 	if OxygenEnabled:
 		if Oxygen < preset_values.CRITICAL_OXYGEN:
 			health_scene.Health -= preset_values.LOW_OXYGEN_DAMAGE_HEALTH
+			if health_scene.Health < 0:
+				health_scene.Health = 0
 	
 	# Toxic Perchlorates Increase AND High Damages Health
 	if ToxicPerchEnabled:
@@ -115,6 +119,8 @@ func tick_update() -> void:
 			ToxicPerch = 100
 		if ToxicPerch >= preset_values.CRITICAL_TOXIC_PERCH:
 			health_scene.Health -= preset_values.TP_DAMAGE_HEALTH
+			if health_scene.Health < 0:
+				health_scene.Health = 0
 	
 	
 	# ================== LINKED COMPONENTS
