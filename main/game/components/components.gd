@@ -1,5 +1,11 @@
+class_name Components
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
+
+const SOLAR_EVENTS = ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash",
+	"Giant Sun Flash", "Solar Cloud Incoming", "Radiation Storm"]
+const SLOW_STORMS = ["Electrostatic Dust Accumulation", "Regional Dust Front"]
+const FAST_STORMS = ["High-Velocity Dust Devil", "Global Regolith Blitz"]
 
 # Variables for bars and stuff
 var Radiation: int = 0
@@ -12,6 +18,10 @@ var SolarPanels: int = 0
 var events_for_today = {} # {event : severity}
 var events_to_occur = {} # {event : severity} : timer after which it occurs
 var events_occurring = {} # {event : severity} : time until it ends
+
+var SolarEventOccurring = false
+enum STORMS {NONE, SLOW, FAST}
+var StormOccurring = STORMS.NONE
 
 # User actions
 var RadiationShieldingEnabled = false
@@ -88,6 +98,8 @@ func tick_update() -> void:
 	# Radiation Increase AND High Damages Health
 	if RadiationEnabled:
 		Radiation += preset_values.RADIATION_GCR_INCREASE
+		if Radiation > 100:
+			Radiation = 100
 		if Radiation >= preset_values.CRITICAL_RADIATION:
 			# damage health
 			pass
@@ -101,6 +113,8 @@ func tick_update() -> void:
 	# Toxic Perchlorates Increase AND High Damages Health
 	if ToxicPerchEnabled:
 		ToxicPerch += preset_values.TOXIC_PERCH_DUST_INCREASE
+		if ToxicPerch > 100:
+			ToxicPerch = 100
 		if ToxicPerch >= preset_values.CRITICAL_TOXIC_PERCH:
 			# damage health
 			pass
@@ -112,43 +126,90 @@ func tick_update() -> void:
 	# Max Power generated when Solar Panels disabled
 	if PowerEnabled and not SolarPanEnabled:
 		Power += preset_values.POWER_1SP_INCREASE * preset_values.MAX_SOLAR_PANELS
+		if Power > 100:
+			Power = 100
 	
-	# Max Power generated when Solar Panels disabled
-	if PowerEnabled and SolarPanEnabled:
+	# Max Power generated when Solar Panels enabled UNLESS Solar Panels Covered
+	if PowerEnabled and SolarPanEnabled and not CoverSolarPanUsing:
 		Power += preset_values.POWER_1SP_INCREASE * SolarPanels
+		if Power > 100:
+			Power = 100
 	
-	# Decreases Health if too many Toxic Perchlorates
+	# Decreases Oxygen if Medium Toxic Perchlorates
 	if OxygenEnabled and ToxicPerchEnabled:
 		if ToxicPerch >= preset_values.MEDIUM_TOXIC_PERCH:
-			# damage health
-			pass
-		
+			# decreases oxygen
+			Oxygen -= preset_values.OXYGEN_TP_DECREASE
+			if Oxygen < 0:
+				Oxygen = 0
+	
+	
+	# ================== EVENT COMPONENTS
+	
+	
+	# Damage Solar Panel Chance
+	if StormsEnabled and SolarPanEnabled:
+		if StormOccurring == STORMS.SLOW:
+			if randf() >= preset_values.SLOW_STORM_SP_DAMAGE_CHANCE:
+				SolarPanels -= 1
+		if StormOccurring == STORMS.FAST:
+			if randf() >= preset_values.FAST_STORM_SP_DAMAGE_CHANCE:
+				SolarPanels -= 1
+		if SolarPanels < 0:
+			SolarPanels = 0
+	
+	# Increases Toxic Perchlorates MASSIVELY if Storm
+	if ToxicPerchEnabled and StormsEnabled and StormOccurring != STORMS.NONE:
+		ToxicPerch += preset_values.TOXIC_PERCH_STORM_INCREASE
+		if ToxicPerch > 100:
+			ToxicPerch = 100
+	
+	# Increase Radiation MASSIVELY if Solar Event
+	if RadiationEnabled and SolarEventOccurring:
+		Radiation += preset_values.RADIATION_SOLAR_EVENT_INCREASE
+		if Radiation > 100:
+			Radiation = 100
+	
+	# ================== EVENT COMPONENTS
+	
+	
+	# Decrease Radiation if Radiation Shielding
+	if RadiationEnabled and RadiationShieldingEnabled and RadiationShieldingUsing:
+		Radiation -= preset_values.RADIATION_SHIELDING_RADIATION_DECREASE
+		Power -= preset_values.RADIATION_SHIELDING_POWER_DECREASE
+		if Radiation < 0:
+			Radiation = 0
+		# stops button if insufficient power
+		if Power < preset_values.RADIATION_SHIELDING_RADIATION_DECREASE:
+			RadiationShieldingUsing = false
+	
+	# Decreases Toxic Perchlorates if Air Filtering
+	if ToxicPerchEnabled and OxygenEnabled and AirFilteringEnabled and AirFilteringUsing:
+		ToxicPerch -= preset_values.AIR_FILTERING_TP_DECREASE
+		Power -= preset_values.AIR_FILTERING_POWER_DECREASE
+		if ToxicPerch < 0:
+			Radiation = 0
+		# stops button if insufficient power
+		if Power < preset_values.AIR_FILTERING_POWER_DECREASE:
+			AirFilteringUsing = false
 	
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	# IGNORE THIS BUCK
-	
-	
-	#for event_dict in events_occurring:
-		#var event_name: String = event_dict.keys()[0]
-		#var severity: int = event_dict[event_name]
-		#
-		#match event_name:
-			#"Solar Cloud Incoming":
-				#Radiation += 2.0 * severity
-				#SolarPanels -= 1.0 * severity
-			#"Toxic Storm":
-				#ToxicPerch += 1.5 * severity
-				#Oxygen -= 1.0 * severity
-			## Add more event names here as needed
-	#print("Stats -> Rad: ", Radiation, " | Power: ", Power, " | O2: ", Oxygen)
+	print("Storm Occurring: " + str(StormOccurring) + " | Solar Event Occurring: " + str(SolarEventOccurring))
+	print("Rad: " + str(Radiation) + " | Power: " + str(Power) + " | O2: " + str(Oxygen) + " | SP: " + str(SolarPanels) + " | TP: " + str(ToxicPerch))
+
+
+func update_occurring_flags() -> void:
+	StormOccurring = STORMS.NONE
+	SolarEventOccurring = false
+
+	for event_dict in events_occurring:
+		var event_name: String = event_dict.keys()[0].trim_suffix("!")
+		if event_name in FAST_STORMS:
+			StormOccurring = STORMS.FAST
+		elif event_name in SLOW_STORMS and StormOccurring != STORMS.FAST:
+			StormOccurring = STORMS.SLOW
+		elif event_name in SOLAR_EVENTS:
+			SolarEventOccurring = true
