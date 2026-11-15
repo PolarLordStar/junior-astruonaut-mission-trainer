@@ -83,11 +83,27 @@ func update_event_timers(delta: float) -> void:
 
 func tick_update() -> void:
 	pass
-	## 1. Baseline changes that happen every tick (even without events)
-	#Oxygen -= 0.5
-	#Power += (SolarPanels / 100.0) * 1.0
-	#
-	## 2. Apply effects from any active events in events_occurring
+	
+	# e.g:
+	#Oxygen += preset_values.OXYGEN_INCREASE_AMOUNT
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	# IGNORE THIS BUCK
+	
+	
 	#for event_dict in events_occurring:
 		#var event_name: String = event_dict.keys()[0]
 		#var severity: int = event_dict[event_name]
@@ -100,12 +116,4 @@ func tick_update() -> void:
 				#ToxicPerch += 1.5 * severity
 				#Oxygen -= 1.0 * severity
 			## Add more event names here as needed
-	#
-	## 3. Keep values within valid bounds
-	#Radiation = clampf(Radiation, 0.0, 100.0)
-	#Power = clampf(Power, 0.0, 100.0)
-	#Oxygen = clampf(Oxygen, 0.0, 100.0)
-	#ToxicPerch = clampf(ToxicPerch, 0.0, 100.0)
-	#SolarPanels = clampf(SolarPanels, 0.0, 100.0)
-	#
 	#print("Stats -> Rad: ", Radiation, " | Power: ", Power, " | O2: ", Oxygen)
