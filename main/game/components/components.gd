@@ -82,12 +82,47 @@ func update_event_timers(delta: float) -> void:
 
 
 func tick_update() -> void:
-	pass
-	
-	# e.g:
-	#Oxygen += preset_values.OXYGEN_INCREASE_AMOUNT
+	# ================== INDIVIDUAL COMPONENTS
 	
 	
+	# Radiation Increase AND High Damages Health
+	if RadiationEnabled:
+		Radiation += preset_values.RADIATION_GCR_INCREASE
+		if Radiation >= preset_values.CRITICAL_RADIATION:
+			# damage health
+			pass
+	
+	# Low Oxygen Damages Health
+	if OxygenEnabled:
+		if Radiation < preset_values.CRITICAL_RADIATION:
+			# damage health
+			pass
+	
+	# Toxic Perchlorates Increase AND High Damages Health
+	if ToxicPerchEnabled:
+		ToxicPerch += preset_values.TOXIC_PERCH_DUST_INCREASE
+		if ToxicPerch >= preset_values.CRITICAL_TOXIC_PERCH:
+			# damage health
+			pass
+	
+	
+	# ================== LINKED COMPONENTS
+	
+	
+	# Max Power generated when Solar Panels disabled
+	if PowerEnabled and not SolarPanEnabled:
+		Power += preset_values.POWER_1SP_INCREASE * preset_values.MAX_SOLAR_PANELS
+	
+	# Max Power generated when Solar Panels disabled
+	if PowerEnabled and SolarPanEnabled:
+		Power += preset_values.POWER_1SP_INCREASE * SolarPanels
+	
+	# Decreases Health if too many Toxic Perchlorates
+	if OxygenEnabled and ToxicPerchEnabled:
+		if ToxicPerch >= preset_values.MEDIUM_TOXIC_PERCH:
+			# damage health
+			pass
+		
 	
 	
 	

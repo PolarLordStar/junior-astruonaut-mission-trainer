@@ -112,8 +112,8 @@ func update_day_by_day_components() -> void:
 			components_script.PowerEnabled = true
 			components_script.RadiationEnabled = true
 			components_script.OxygenEnabled = false
-			components_script.ToxicPerch = false
-			components_script.SolarPanels = false
+			components_script.ToxicPerchEnabled = false
+			components_script.SolarPanEnabled = false
 			components_script.StormsEnabled = false
 			components_script.SlowStormsEnabled = false
 			components_script.FastStormsEnabled = false
@@ -126,8 +126,8 @@ func update_day_by_day_components() -> void:
 			components_script.PowerEnabled = true
 			components_script.RadiationEnabled = true
 			components_script.OxygenEnabled = true
-			components_script.ToxicPerch = true
-			components_script.SolarPanels = false
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = false
 			components_script.StormsEnabled = false
 			components_script.SlowStormsEnabled = false
 			components_script.FastStormsEnabled = false
@@ -140,8 +140,8 @@ func update_day_by_day_components() -> void:
 			components_script.PowerEnabled = true
 			components_script.RadiationEnabled = true
 			components_script.OxygenEnabled = true
-			components_script.ToxicPerch = true
-			components_script.SolarPanels = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
 			components_script.StormsEnabled = true
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true
@@ -154,8 +154,8 @@ func update_day_by_day_components() -> void:
 			components_script.PowerEnabled = true
 			components_script.RadiationEnabled = true
 			components_script.OxygenEnabled = true
-			components_script.ToxicPerch = true
-			components_script.SolarPanels = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
 			components_script.StormsEnabled = true
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true
@@ -168,8 +168,8 @@ func update_day_by_day_components() -> void:
 			components_script.PowerEnabled = true
 			components_script.RadiationEnabled = true
 			components_script.OxygenEnabled = true
-			components_script.ToxicPerch = true
-			components_script.SolarPanels = true
+			components_script.ToxicPerchEnabled = true
+			components_script.SolarPanEnabled = true
 			components_script.StormsEnabled = true
 			components_script.SlowStormsEnabled = true
 			components_script.FastStormsEnabled = true

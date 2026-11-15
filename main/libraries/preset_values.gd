@@ -26,5 +26,14 @@ const TOXIC_PERCH: int = 0
 const MAX_SOLAR_PANELS: int = 6
 const SOLAR_PANELS: int = 6
 
+const RADIATION_GCR_INCREASE: int = 1
+const CRITICAL_RADIATION: int = 90 # decreases health above or equal
+const CRITICAL_OXYGEN: int = 10 # decreases health below
+const TOXIC_PERCH_DUST_INCREASE: int = 1
+const CRITICAL_TOXIC_PERCH: int = 90 # decreases health above or equal
+const MEDIUM_TOXIC_PERCH: int = 50 # decreases above or equal
+
+const POWER_1SP_INCREASE: int = 1
+
 
 # COMPONENTS
