@@ -19,6 +19,7 @@ var _sound_value: Label
 
 func _ready() -> void:
 	layer = 100
+	process_mode = Node.PROCESS_MODE_ALWAYS   # still works when opened from the paused in-game menu
 	add_to_group("options_menu")
 	if ResourceLoader.exists(FONT_PATH):
 		_font = load(FONT_PATH) as Font
