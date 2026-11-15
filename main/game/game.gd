@@ -1,5 +1,5 @@
 extends Node
-var preset_values = preload("res://main/libraries/preset_values.gd")
+var preset_values = preload("res://main/libraries/preset_values.gd").new()
 var player_script = preload("res://main/game/player/player.gd").new()
 var save_script = preload("res://scripts/save_manager.gd")
 var components_script = preload("res://main/game/components/components.gd").new()
@@ -8,16 +8,8 @@ var day_number: int = save_script.new().load_day()
 var date
 
 func setup() -> void:
-	# Resetting Values
-	day_number += 1
-	date = await DonkiService.fetch_random_day()
-	
 	# Resetting Components
-	player_script.health = preset_values.new().MAX_HEALTH
-	# ...
-	
-	# Enabling Day-Dependent Components
-	# ...
+	update_components()
 	
 	# Events
 	components_script.events_for_today = {}
@@ -27,7 +19,7 @@ func setup() -> void:
 	start_event_timers()
 	
 	# Other
-	$Timers/DayTimer.wait_time = preset_values.new().DAY_DURATION
+	$Timers/DayTimer.wait_time = preset_values.DAY_DURATION
 	$Timers/DayTimer.start()
 	$Timers/TickUpdateTimer.start()
 
@@ -97,5 +89,89 @@ func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> voi
 
 
 # COMPONENTS
+func update_components() -> void:
+	player_script.health = preset_values.MAX_HEALTH
+	components_script.Radiation = preset_values.RADIATION
+	components_script.Power = preset_values.POWER
+	components_script.Oxygen = preset_values.OXYGEN
+	components_script.ToxicPerch = preset_values.TOXIC_PERCH
+	components_script.SolarPanels = preset_values.SOLAR_PANELS
+	
+	# Resetting Values
+	day_number += 1
+	date = await DonkiService.fetch_random_day()
+	
+	# Enabling Day-Dependent Components
+	match day_number:
+		1:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = false
+			components_script.ToxicPerch = false
+			components_script.SolarPanels = false
+			components_script.StormsEnabled = false
+			components_script.SlowStormsEnabled = false
+			components_script.FastStormsEnabled = false
+			
+			components_script.RadiationShielding = true
+			components_script.AirFiltering = false
+			components_script.CoverSolarPan = false
+		
+		2:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerch = true
+			components_script.SolarPanels = false
+			components_script.StormsEnabled = false
+			components_script.SlowStormsEnabled = false
+			components_script.FastStormsEnabled = false
+			
+			components_script.RadiationShielding = true
+			components_script.AirFiltering = true
+			components_script.CoverSolarPan = false
+		
+		3:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerch = true
+			components_script.SolarPanels = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShielding = true
+			components_script.AirFiltering = true
+			components_script.CoverSolarPan = true
+		
+		4:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerch = true
+			components_script.SolarPanels = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShielding = true
+			components_script.AirFiltering = true
+			components_script.CoverSolarPan = true
+		
+		5:
+			components_script.PowerEnabled = true
+			components_script.RadiationEnabled = true
+			components_script.OxygenEnabled = true
+			components_script.ToxicPerch = true
+			components_script.SolarPanels = true
+			components_script.StormsEnabled = true
+			components_script.SlowStormsEnabled = true
+			components_script.FastStormsEnabled = true
+			
+			components_script.RadiationShielding = true
+			components_script.AirFiltering = true
+			components_script.CoverSolarPan = true
+
 func _updating_tick() -> void:
 	components_script.tick_update()
