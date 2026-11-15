@@ -14,6 +14,7 @@ func _on_pressed() -> void:
 		message.emit("Game scene not found: " + GAME_SCENE)
 		return
 	_starting = true
+	GameSounds.play_retry()   # keeps playing after the scene change (it lives on the scene root)
 	save_script.new().delete_save()
 	var layer := CanvasLayer.new()
 	layer.layer = 100
