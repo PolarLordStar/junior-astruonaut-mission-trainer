@@ -1,5 +1,6 @@
 class_name RadiationSensor
 extends Sensor
+## In the game its value is Components.Radiation (0 .. MAX_RADIATION), converted to this sensor's range.
 ## Radiation (Environment monitor). Rises when a solar flare approaches and spikes when it hits.
 ## FOR NASA DATA: change the numbers below, and/or fill the "Data" array in the Inspector.
 
@@ -39,6 +40,10 @@ func _init() -> void:
 
 func _ready() -> void:
 	_storm = get_tree().get_first_node_in_group("storm") as StormSystem
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.Radiation, PRESET.MAX_RADIATION))
 
 
 func _simulate(delta: float) -> void:

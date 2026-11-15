@@ -1,7 +1,8 @@
 class_name OxygenSensor
 extends Sensor
-## Oxygen level. ONE node feeds BOTH the Environment monitor ("oxygen level" row) and the
-## Life Support monitor ("oxygen supply" bar). Drains faster when power is low; a reserve tank
+## In the game its value is Components.Oxygen (0 .. MAX_OXYGEN), converted to this sensor's range.
+## Oxygen level. Feeds the Life Support monitor ("oxygen supply" bar) and the low-oxygen warnings.
+## It has NO row on the Environment monitor any more (set show_on_environment = true to bring it back). Drains faster when power is low; a reserve tank
 ## refills it when it runs out.
 ## FOR NASA DATA: change the numbers below, and/or fill the "Data" array in the Inspector.
 
@@ -34,7 +35,7 @@ func _init() -> void:
 	danger_at = DANGER
 	warn_title = "OXYGEN DROPPING"
 	danger_title = "LOW OXYGEN SUPPLY"
-	show_on_environment = true
+	show_on_environment = false   # no row on the Environment monitor (the Life Support bar still uses this sensor)
 	value = START
 
 
@@ -44,6 +45,10 @@ func _ready() -> void:
 
 func detail() -> String:
 	return "%d%% remaining" % roundi(value)
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.Oxygen, PRESET.MAX_OXYGEN))
 
 
 func _simulate(delta: float) -> void:

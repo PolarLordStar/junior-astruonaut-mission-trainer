@@ -4,7 +4,15 @@ extends Node
 ## You never add a plain "Sensor" node. Add one of its children instead:
 ## RadiationSensor, OxygenSensor, PerchlorateSensor, PowerSensor, SolarPanelsSensor (or your own).
 ##
-## Three ways a sensor gets its number:
+## In the real game a sensor takes its number from the Components object that the Game node owns
+## (Game.components_script, see main/game/components/components.gd): Radiation, Power, Oxygen,
+## ToxicPerch and SolarPanels. That is the game state, so the monitors always show what Components
+## holds. Components values run from 0 up to their MAX in main/libraries/preset_values.gd; each
+## sensor converts that to its own range below. The sensor finds Components by itself (it looks
+## through its parents for a node that has "components_script"), so nothing has to be wired up.
+##
+## Otherwise (no Game around, e.g. you run control_room.tscn on its own, or "Use Components" is off)
+## there are three ways a sensor gets its number:
 ##   1. simulate = true (default): the sensor's own _simulate() invents believable numbers.
 ##   2. simulate = false and the "Data" array filled in the Inspector: it plays your list of real
 ##      values, one every "Seconds Per Sample"   <-- paste NASA numbers here.
@@ -28,6 +36,8 @@ var show_on_environment := false   # true = gets a row on the Environment monito
 
 # ---- editable in the Inspector ----
 @export_group("Data source")
+## ON = read the value from the game's Components object (when there is one). OFF = use the options below.
+@export var use_components := true
 ## ON = built-in simulation. OFF = use the Data array below (or your own set_value() calls).
 @export var simulate := true
 ## Real measurements, one number per sample (used when Simulate is off).
@@ -35,17 +45,26 @@ var show_on_environment := false   # true = gets a row on the Environment monito
 @export var seconds_per_sample := 2.0
 @export var loop_data := true
 
+## Used to turn a Components value (0 .. MAX_xxx) into this sensor's own range.
+const PRESET := preload("res://main/libraries/preset_values.gd")
+
 var value := 0.0
 var _data_t := 0.0
+var components   # the Components object (components.gd) that Game owns; null when there is no Game
 
 
 ## Registered here (not in _init) so it always happens, whatever the child scripts do in their own _init.
 func _enter_tree() -> void:
 	add_to_group("sensors")
+	components = _find_components()
+	if use_components and components != null:
+		_pull_from_components()   # so the very first frame already shows the real value
 
 
 func _process(delta: float) -> void:
-	if simulate:
+	if use_components and components != null:
+		_pull_from_components()
+	elif simulate:
 		_simulate(delta)
 	elif data.size() > 0:
 		_data_t += delta
@@ -57,7 +76,27 @@ func _process(delta: float) -> void:
 		set_value(data[i])
 
 
-## Override in each sensor: update "value" here.
+## Looks up through the parents for the node that owns the Components (the Game node).
+func _find_components():
+	var n := get_parent()
+	while n != null:
+		if "components_script" in n:
+			return n.components_script
+		n = n.get_parent()
+	return null
+
+
+## Override in each sensor: read the matching variable from "components" and call set_value().
+func _pull_from_components() -> void:
+	pass
+
+
+## Converts a Components value (0 .. components_max) into this sensor's own range (min_value .. max_value).
+func _from_components(v, components_max: float) -> float:
+	return remap(float(v), 0.0, components_max, min_value, max_value)
+
+
+## Override in each sensor: update "value" here (used when there is no Components).
 func _simulate(_delta: float) -> void:
 	pass
 

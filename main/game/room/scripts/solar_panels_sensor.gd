@@ -1,5 +1,6 @@
 class_name SolarPanelsSensor
 extends Sensor
+## In the game its value is Components.SolarPanels (0 .. MAX_SOLAR_PANELS), converted to this sensor's range.
 ## The 6 solar panels (Life Support monitor). Each panel is simply working or not working.
 ## "value" is the number of working panels, 0-6 (shown in the number box on the monitor);
 ## PowerSensor uses it too.
@@ -70,6 +71,10 @@ func _recalc() -> void:
 		if p:
 			working += 1
 	value = float(working)
+
+
+func _pull_from_components() -> void:
+	set_value(_from_components(components.SolarPanels, PRESET.MAX_SOLAR_PANELS))
 
 
 func _simulate(delta: float) -> void:

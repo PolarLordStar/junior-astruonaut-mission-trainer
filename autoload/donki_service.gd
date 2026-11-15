@@ -8,6 +8,7 @@ const FALLBACK_PATH := "res://data/donki_fallback.json"
 const REQUEST_TIMEOUT := 15.0
 const MAX_RANGE_DAYS := 365
 const EARLIEST_RANDOM_DATE := "2011-01-01"
+const MAX_RANDOM_TRIES := 10   # how many random dates fetch_random_day() tries before giving up
 
 var events: Array = []
 var loaded := false
@@ -73,6 +74,7 @@ func load_events_for_date(date: String) -> Array:
 #   "date"          the random date, e.g. "2024-05-10"
 #   "events"        Array of game-ready events (name, kind, severity, time, action, details)
 #   "count"         number of events
+#   "tries"         how many random dates were rolled to find this one
 #   "source"        "live", "cache" or "fallback"
 #   "reached_nasa"  true if NASA answered; false means the result may be incomplete
 #   "message"       one-line summary you can show on screen
@@ -81,13 +83,28 @@ func fetch_random_day(print_report: bool = true) -> Dictionary:
 	while _loading:
 		await get_tree().process_frame
 
-	var date := random_date()
-	await load_events(date, date)
+	# Roll a random date. If NASA recorded nothing that day, roll a new one.
+	# Stops early if NASA can't be reached (rolling again wouldn't help) or after MAX_RANDOM_TRIES.
+	var date := ""
+	var tries := 0
+	while true:
+		tries += 1
+		date = random_date()
+		await load_events(date, date)
+
+		if not events.is_empty():
+			break   # found a day with events
+		if source != "live":
+			break   # couldn't reach NASA, so an empty result doesn't mean "no events"
+		if tries >= MAX_RANDOM_TRIES:
+			break   # give up and report the empty day
+		print("DONKI: no events on %s, rolling a new date..." % date)
 
 	var result := {
 		"date": date,
 		"events": events,
 		"count": events.size(),
+		"tries": tries,
 		"source": source,
 		"reached_nasa": source == "live",
 		"message": _day_message(date),
@@ -243,10 +260,7 @@ func _convert(raw: Dictionary) -> Array:
 			"time": _s(f.get("peakTime", f.get("beginTime", ""))),
 			"action": "Move to the shelter" if severity >= 2 else "Check the solar panels",
 			"details": {
-				"NASA class": class_full,
 				"Began": _s(f.get("beginTime", "")),
-				"Peak": _s(f.get("peakTime", "")),
-				"Ended": _s(f.get("endTime", "")),
 			},
 		})
 
@@ -260,7 +274,6 @@ func _convert(raw: Dictionary) -> Array:
 			"action": "Prepare the outpost",
 			"details": {
 				"Started": _s(c.get("startTime", "")),
-				"Speed": _cme_speed(c),
 			},
 		})
 
