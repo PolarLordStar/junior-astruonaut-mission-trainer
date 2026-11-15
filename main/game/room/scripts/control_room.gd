@@ -929,12 +929,13 @@ func _action_button(parent: Node3D, pos: Vector3, text: String, col: Color) -> A
 	parent.add_child(station)
 	var plate := _box(station, Vector3(0, 0.025, -0.08), Vector3(0.62, 0.05, 0.56), Color("3b3d45"))
 	plate.material_override = _grunge(Color("3b3d45"))
-	_box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge
+	var bar := _box(station, Vector3(0, 0.052, 0.185), Vector3(0.62, 0.012, 0.03), TRIM)   # orange front edge: lights up when the button is ON
 	var b := ActionButton.new()
 	b.label_text = text
 	b.color = col
 	b.position = Vector3(0, 0.05, 0)
 	station.add_child(b)
+	b.setup_indicator(bar)
 	_action_buttons.append(b)
 	return b
 
