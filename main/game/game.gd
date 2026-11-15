@@ -21,6 +21,7 @@ func setup() -> void:
 	
 	# Events
 	components_script.events_for_today = {}
+	components_script.events_to_occur = {}
 	components_script.events_occurring = {}
 	components_script.decide_events(date, day_number)
 	start_event_timers()
@@ -44,6 +45,10 @@ func _ready() -> void:
 
 
 # EVENTS
+func _process(delta: float) -> void:
+	components_script.update_event_timers(delta)   # live countdowns shown on the 3rd monitor
+
+
 func start_event_timers() -> void:
 	# Clear any leftover event timers from the previous day
 	for child in $Timers.get_children():
@@ -65,7 +70,8 @@ func start_event_timers() -> void:
 		event_timer.start()
 
 func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_timer: Timer) -> void:
-	# 1. Add the event to events_occurring
+	# 1. Move the event from events_to_occur to events_occurring
+	components_script.events_to_occur.erase(event_dict)
 	components_script.events_occurring[event_dict] = duration
 	print("Event started: ", event_dict, " | Ends in: ", duration, "s")
 	

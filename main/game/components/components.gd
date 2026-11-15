@@ -67,6 +67,15 @@ func decide_events(date, day_number: int) -> void:
 	
 	print("Scheduled events: ", events_to_occur)
 
+# Counts both event timers down (called every frame by game.gd, so they stop while the game is paused).
+# The monitors read these numbers: events_to_occur = seconds until it occurs, events_occurring = seconds until it ends.
+func update_event_timers(delta: float) -> void:
+	for event in events_to_occur:
+		events_to_occur[event] = maxf(0.0, events_to_occur[event] - delta)
+	for event in events_occurring:
+		events_occurring[event] = maxf(0.0, events_occurring[event] - delta)
+
+
 func tick_update() -> void:
 	pass
 	## 1. Baseline changes that happen every tick (even without events)
