@@ -2,7 +2,7 @@ extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
 var player_script = preload("res://main/game/player/player.gd").new()
 var save_script = preload("res://scripts/save_manager.gd").new()
-var components_script = preload("res://main/game/components/components.gd").new()
+@onready var components_scene = get_node("Components")
 @onready var day_counter: CanvasLayer = $DayCounter
 
 var day_number: int = save_script.load_day()
@@ -11,15 +11,15 @@ var date
 func setup() -> void:
 	# Resetting Values
 	player_script.health = preset_values.MAX_HEALTH
-	components_script.Radiation = preset_values.RADIATION
-	components_script.Power = preset_values.POWER
-	components_script.Oxygen = preset_values.OXYGEN
-	components_script.ToxicPerch = preset_values.TOXIC_PERCH
-	components_script.SolarPanels = preset_values.SOLAR_PANELS
+	components_scene.Radiation = preset_values.RADIATION
+	components_scene.Power = preset_values.POWER
+	components_scene.Oxygen = preset_values.OXYGEN
+	components_scene.ToxicPerch = preset_values.TOXIC_PERCH
+	components_scene.SolarPanels = preset_values.SOLAR_PANELS
 	
-	components_script.AirFilteringUsing = false
-	components_script.CoverSolarPanUsing = false
-	components_script.RadiationShieldingUsing = false
+	components_scene.AirFilteringUsing = false
+	components_scene.CoverSolarPanUsing = false
+	components_scene.RadiationShieldingUsing = false
 	
 	day_number += 1
 	date = await DonkiService.fetch_random_day()
@@ -28,12 +28,12 @@ func setup() -> void:
 	update_day_by_day_components()
 	
 	# Events
-	components_script.events_for_today = {}
-	components_script.events_to_occur = {}
-	components_script.events_occurring = {}
-	components_script.SolarEventOccurring = false
-	components_script.StormOccurring = components_script.STORMS.NONE
-	components_script.decide_events(date)
+	components_scene.events_for_today = {}
+	components_scene.events_to_occur = {}
+	components_scene.events_occurring = {}
+	components_scene.SolarEventOccurring = false
+	components_scene.StormOccurring = components_scene.STORMS.NONE
+	components_scene.decide_events(date)
 	start_event_timers()
 	
 	# Other
@@ -57,7 +57,7 @@ func _ready() -> void:
 
 # EVENTS
 func _process(delta: float) -> void:
-	components_script.update_event_timers(delta)   # live countdowns shown on the 3rd monitor
+	components_scene.update_event_timers(delta)   # live countdowns shown on the 3rd monitor
 
 
 func start_event_timers() -> void:
@@ -68,8 +68,8 @@ func start_event_timers() -> void:
 	
 	
 	# Loop through each {event: severity} : delay_time pair
-	for event_dict in components_script.events_to_occur:
-		var delay_time: float = components_script.events_to_occur[event_dict]
+	for event_dict in components_scene.events_to_occur:
+		var delay_time: float = components_scene.events_to_occur[event_dict]
 		
 		var event_timer = Timer.new()
 		event_timer.wait_time = delay_time
@@ -82,9 +82,9 @@ func start_event_timers() -> void:
 
 func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_timer: Timer) -> void:
 	# 1. Move the event from events_to_occur to events_occurring
-	components_script.events_to_occur.erase(event_dict)
-	components_script.events_occurring[event_dict] = duration
-	components_script.update_occurring_flags()
+	components_scene.events_to_occur.erase(event_dict)
+	components_scene.events_occurring[event_dict] = duration
+	components_scene.update_occurring_flags()
 	print("Event started: ", event_dict, " | Ends in: ", duration, "s")
 	
 	# 2. Clean up the start delay timer
@@ -104,8 +104,8 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 
 func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> void:
 	# Remove the expired event from events_occurring
-	components_script.events_occurring.erase(event_dict)
-	components_script.update_occurring_flags()
+	components_scene.events_occurring.erase(event_dict)
+	components_scene.update_occurring_flags()
 	print("Event ended: ", event_dict)
 	
 	# Clean up the duration timer node
@@ -119,74 +119,74 @@ func _on_event_duration_timeout(event_dict: Dictionary, end_timer: Timer) -> voi
 func update_day_by_day_components() -> void:
 	match day_number:
 		1:
-			components_script.PowerEnabled = true
-			components_script.RadiationEnabled = true
-			components_script.OxygenEnabled = false
-			components_script.ToxicPerchEnabled = false
-			components_script.SolarPanEnabled = false
-			components_script.StormsEnabled = false
-			components_script.SlowStormsEnabled = false
-			components_script.FastStormsEnabled = false
+			components_scene.PowerEnabled = true
+			components_scene.RadiationEnabled = true
+			components_scene.OxygenEnabled = false
+			components_scene.ToxicPerchEnabled = false
+			components_scene.SolarPanEnabled = false
+			components_scene.StormsEnabled = false
+			components_scene.SlowStormsEnabled = false
+			components_scene.FastStormsEnabled = false
 			
-			components_script.RadiationShieldingEnabled = true
-			components_script.AirFilteringEnabled = false
-			components_script.CoverSolarPanEnabled = false
+			components_scene.RadiationShieldingEnabled = true
+			components_scene.AirFilteringEnabled = false
+			components_scene.CoverSolarPanEnabled = false
 		
 		2:
-			components_script.PowerEnabled = true
-			components_script.RadiationEnabled = true
-			components_script.OxygenEnabled = true
-			components_script.ToxicPerchEnabled = true
-			components_script.SolarPanEnabled = false
-			components_script.StormsEnabled = false
-			components_script.SlowStormsEnabled = false
-			components_script.FastStormsEnabled = false
+			components_scene.PowerEnabled = true
+			components_scene.RadiationEnabled = true
+			components_scene.OxygenEnabled = true
+			components_scene.ToxicPerchEnabled = true
+			components_scene.SolarPanEnabled = false
+			components_scene.StormsEnabled = false
+			components_scene.SlowStormsEnabled = false
+			components_scene.FastStormsEnabled = false
 			
-			components_script.RadiationShieldingEnabled = true
-			components_script.AirFilteringEnabled = true
-			components_script.CoverSolarPanEnabled = false
+			components_scene.RadiationShieldingEnabled = true
+			components_scene.AirFilteringEnabled = true
+			components_scene.CoverSolarPanEnabled = false
 		
 		3:
-			components_script.PowerEnabled = true
-			components_script.RadiationEnabled = true
-			components_script.OxygenEnabled = true
-			components_script.ToxicPerchEnabled = true
-			components_script.SolarPanEnabled = true
-			components_script.StormsEnabled = true
-			components_script.SlowStormsEnabled = true
-			components_script.FastStormsEnabled = true
+			components_scene.PowerEnabled = true
+			components_scene.RadiationEnabled = true
+			components_scene.OxygenEnabled = true
+			components_scene.ToxicPerchEnabled = true
+			components_scene.SolarPanEnabled = true
+			components_scene.StormsEnabled = true
+			components_scene.SlowStormsEnabled = true
+			components_scene.FastStormsEnabled = true
 			
-			components_script.RadiationShieldingEnabled = true
-			components_script.AirFilteringEnabled = true
-			components_script.CoverSolarPanEnabled = true
+			components_scene.RadiationShieldingEnabled = true
+			components_scene.AirFilteringEnabled = true
+			components_scene.CoverSolarPanEnabled = true
 		
 		4:
-			components_script.PowerEnabled = true
-			components_script.RadiationEnabled = true
-			components_script.OxygenEnabled = true
-			components_script.ToxicPerchEnabled = true
-			components_script.SolarPanEnabled = true
-			components_script.StormsEnabled = true
-			components_script.SlowStormsEnabled = true
-			components_script.FastStormsEnabled = true
+			components_scene.PowerEnabled = true
+			components_scene.RadiationEnabled = true
+			components_scene.OxygenEnabled = true
+			components_scene.ToxicPerchEnabled = true
+			components_scene.SolarPanEnabled = true
+			components_scene.StormsEnabled = true
+			components_scene.SlowStormsEnabled = true
+			components_scene.FastStormsEnabled = true
 			
-			components_script.RadiationShieldingEnabled = true
-			components_script.AirFilteringEnabled = true
-			components_script.CoverSolarPanEnabled = true
+			components_scene.RadiationShieldingEnabled = true
+			components_scene.AirFilteringEnabled = true
+			components_scene.CoverSolarPanEnabled = true
 		
 		5:
-			components_script.PowerEnabled = true
-			components_script.RadiationEnabled = true
-			components_script.OxygenEnabled = true
-			components_script.ToxicPerchEnabled = true
-			components_script.SolarPanEnabled = true
-			components_script.StormsEnabled = true
-			components_script.SlowStormsEnabled = true
-			components_script.FastStormsEnabled = true
+			components_scene.PowerEnabled = true
+			components_scene.RadiationEnabled = true
+			components_scene.OxygenEnabled = true
+			components_scene.ToxicPerchEnabled = true
+			components_scene.SolarPanEnabled = true
+			components_scene.StormsEnabled = true
+			components_scene.SlowStormsEnabled = true
+			components_scene.FastStormsEnabled = true
 			
-			components_script.RadiationShieldingEnabled = true
-			components_script.AirFilteringEnabled = true
-			components_script.CoverSolarPanEnabled = true
+			components_scene.RadiationShieldingEnabled = true
+			components_scene.AirFilteringEnabled = true
+			components_scene.CoverSolarPanEnabled = true
 
 func _updating_tick() -> void:
-	components_script.tick_update()
+	components_scene.tick_update()
