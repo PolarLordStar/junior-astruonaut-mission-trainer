@@ -66,6 +66,11 @@ func _process(delta: float) -> void:
 	_dots_timer += delta * 3.0
 	_title.text = "LOADING" + ".".repeat(int(_dots_timer) % 4)
 
+# While this screen is up, Esc must not open the pause menu. _input() runs before the pause
+# menu's _unhandled_input(), so swallowing the key here means the menu never sees it.
+func _input(event: InputEvent) -> void:
+	if visible and event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
 
 ## Shows the screen straight away (no fade in, so nothing is visible before it).
 func show_loading() -> void:
