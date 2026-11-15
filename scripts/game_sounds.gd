@@ -8,11 +8,13 @@ extends RefCounted
 ##     GameSounds.play_death()
 ##     GameSounds.play_retry()
 ##     GameSounds.play_click()
+##     GameSounds.play_button_press()
 ##
 ## Who calls what right now:
 ##     play_hurt / play_death   game.gd, when player.gd says the player was hurt / died
 ##     play_retry               scripts/restart_button.gd (main menu "Restart")
 ##     play_click               scripts/mc_button.gd (every McButton: main menu, pause menu, options)
+##     play_button_press        main/game/room/scripts/action_button.gd (the 3 push-buttons on the control-room desk)
 ## (the control-room hum is not here: it is the AmbiencePlayer node in control_room.tscn)
 ##
 ## VOLUME: every sound follows GameSettings.common_sound (0 = silent, 100 = full), read at the
@@ -29,11 +31,13 @@ const HURT_PATH := "res://Assets/sounds/player/HurtPlayer.wav"
 const DEATH_PATH := "res://Assets/sounds/player/DeathPlayer.wav"
 const RETRY_PATH := "res://Assets/sounds/player/RetryGame.wav"
 const CLICK_PATH := "res://Assets/sounds/ui/MinecraftClick.wav"
+const BUTTON_PRESS_PATH := "res://Assets/sounds/ui/ButtonPress.wav"
 
 const HURT_GAIN_DB := 0.0
 const DEATH_GAIN_DB := 0.0
 const RETRY_GAIN_DB := 0.0
 const CLICK_GAIN_DB := 0.0
+const BUTTON_PRESS_GAIN_DB := -6.0   # recorded louder than the other sounds, so it is turned down a bit
 
 ## Godot's quietest volume. Used when Common sound is 0.
 const SILENT_DB := -80.0
@@ -63,6 +67,11 @@ static func play_retry() -> void:
 ## A menu button was clicked.
 static func play_click() -> void:
 	_play(CLICK_PATH, CLICK_GAIN_DB)
+
+
+## One of the push-buttons on the control-room desk was pressed.
+static func play_button_press() -> void:
+	_play(BUTTON_PRESS_PATH, BUTTON_PRESS_GAIN_DB)
 
 
 ## The volume (in dB) for GameSettings.common_sound, plus an optional gain for one sound.

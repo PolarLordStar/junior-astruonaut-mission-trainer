@@ -108,7 +108,10 @@ func set_hover(on: bool) -> void:
 
 
 ## Toggles ON / OFF with an animation and emits "pressed" and "toggled" straight away.
+## Plays the button-press sound on every click. The sound is here and not in set_on(), so
+## switching a button from code stays silent.
 func press() -> void:
+	GameSounds.play_button_press()
 	set_on(not is_on)
 	pressed.emit()
 
