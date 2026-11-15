@@ -268,7 +268,7 @@ func _convert(raw: Dictionary) -> Array:
 		out.append({
 			"id": _s(c.get("activityID", "")),
 			"kind": "cme",
-			"name": "Solar Cloud Incoming",
+			"name": "Solar Event Incoming",
 			"severity": 2,
 			"time": _s(c.get("startTime", "")),
 			"action": "Prepare the outpost",
