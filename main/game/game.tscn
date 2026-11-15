@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://x0mt4djj6vod" path="res://main/game/ui/day_counter.tscn" id="3_daycounter"]
 [ext_resource type="PackedScene" uid="uid://cxk33i3nocbt" path="res://main/game/player/player_sounds.tscn" id="4_ej72j"]
 [ext_resource type="PackedScene" path="res://main/game/ui/day_transition.tscn" id="5_458dk"]
+[ext_resource type="PackedScene" path="res://main/game/ui/low_health_overlay.tscn" id="6_lowhp"]
+[ext_resource type="PackedScene" path="res://main/game/ui/death_screen.tscn" id="7_death"]
 
 [node name="Game" type="Node" unique_id=466476844]
 script = ExtResource("1_3epdo")
@@ -27,9 +29,13 @@ one_shot = true
 
 [node name="ControlRoom" parent="." unique_id=1901615750 instance=ExtResource("2_5mlo5")]
 
+[node name="LowHealthOverlay" parent="." instance=ExtResource("6_lowhp")]
+
 [node name="DayCounter" parent="." unique_id=1010252669 instance=ExtResource("3_daycounter")]
 
 [node name="DayTransition" parent="." unique_id=2083233202 instance=ExtResource("5_458dk")]
+
+[node name="DeathScreen" parent="." instance=ExtResource("7_death")]
 
 [connection signal="timeout" from="Timers/DayTimer" to="." method="_on_day_end"]
 [connection signal="timeout" from="Timers/TickUpdateTimer" to="." method="_updating_tick"]
