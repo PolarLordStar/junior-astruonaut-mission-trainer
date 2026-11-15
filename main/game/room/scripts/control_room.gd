@@ -303,15 +303,12 @@ func _push_screens() -> void:
 		var sp := sensors.get("panels") as SolarPanelsSensor
 		if sp != null:
 			st.panels = sp.panels
-		if clock != null:
-			st.sol = clock.sol
-			st.clock_s = clock.clock_s
 	var env := _env_screen
 	if env != null:
 		for id in env.rows.keys():
 			env.set_value(id, _val(id))
 		if clock != null:
-			env.set_time(clock.sol, clock.clock_s)
+			env.set_time(clock.clock_s)
 	var al := _alerts_screen
 	if al != null:
 		al.set_warnings(_warnings)
