@@ -1,8 +1,9 @@
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
-var player_script = preload("res://main/game/player/player.gd").new()
 var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var components_scene = get_node("Components")
+@onready var health_scene = get_node("Health")
+@onready var player_sounds = $PlayerSounds
 @onready var day_counter: CanvasLayer = $DayCounter
 @onready var day_transition: CanvasLayer = $DayTransition   # "You have survived!" screen (ui/day_transition.tscn)
 
@@ -12,7 +13,7 @@ var date
 
 func setup() -> void:
 	# Resetting Values
-	player_script.health = preset_values.MAX_HEALTH
+	health_scene.Health = preset_values.MAX_HEALTH
 	components_scene.Radiation = preset_values.RADIATION
 	components_scene.Power = preset_values.POWER
 	components_scene.Oxygen = preset_values.OXYGEN
@@ -24,9 +25,7 @@ func setup() -> void:
 	components_scene.RadiationShieldingUsing = false
 	
 	# Control-room ambience (it is stopped when the player dies, so start it again for the new attempt)
-	var ambience := _get_ambience()
-	if ambience != null:
-		ambience.play_ambience()
+	player_sounds.start_ambience()
 	
 	day_number += 1
 	date = await DonkiService.fetch_random_day()
@@ -69,8 +68,6 @@ func _on_transition_main_menu() -> void:
 	get_tree().change_scene_to_file("res://main_menu.tscn")
 
 func _ready() -> void:
-	player_script.hurt.connect(_on_player_hurt)
-	player_script.died.connect(_on_player_died)
 	day_transition.continue_pressed.connect(_on_transition_continue)
 	day_transition.main_menu_pressed.connect(_on_transition_main_menu)
 	start()

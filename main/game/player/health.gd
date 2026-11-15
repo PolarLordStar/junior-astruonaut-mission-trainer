@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends Node
 
 var preset_values = preload("res://main/libraries/preset_values.gd")
 
@@ -9,13 +9,13 @@ signal died
 
 # Whenever health is changed from anywhere (player_script.health -= 5), the setter below sends
 # the signals above. Setting it back to full (a new day / a new attempt) sends nothing.
-@export var health: int = preset_values.MAX_HEALTH:
+@export var Health: int = preset_values.MAX_HEALTH:
 	set(value):
-		var old_health := health
-		health = value
+		var old_health := Health
+		Health = value
 		if old_health <= 0:
 			return   # already dead: nothing more to announce
-		if health <= 0:
+		if Health <= 0:
 			died.emit()
-		elif health < old_health:
+		elif Health < old_health:
 			hurt.emit()

@@ -1,5 +1,6 @@
 extends Node
 var preset_values = preload("res://main/libraries/preset_values.gd").new()
+@onready var health_scene = get_parent().get_node("Health")
 
 const SOLAR_EVENTS = ["Tiny Sun Flash", "Small Sun Flash", "Medium Sun Flash",
 	"Giant Sun Flash", "Solar Cloud Incoming", "Radiation Storm"]
@@ -100,14 +101,12 @@ func tick_update() -> void:
 		if Radiation > 100:
 			Radiation = 100
 		if Radiation >= preset_values.CRITICAL_RADIATION:
-			# damage health
-			pass
+			health_scene.Health -= preset_values.RADIATION_DAMAGE_HEALTH
 	
 	# Low Oxygen Damages Health
 	if OxygenEnabled:
-		if Radiation < preset_values.CRITICAL_RADIATION:
-			# damage health
-			pass
+		if Oxygen < preset_values.CRITICAL_OXYGEN:
+			health_scene.Health -= preset_values.LOW_OXYGEN_DAMAGE_HEALTH
 	
 	# Toxic Perchlorates Increase AND High Damages Health
 	if ToxicPerchEnabled:
@@ -115,8 +114,7 @@ func tick_update() -> void:
 		if ToxicPerch > 100:
 			ToxicPerch = 100
 		if ToxicPerch >= preset_values.CRITICAL_TOXIC_PERCH:
-			# damage health
-			pass
+			health_scene.Health -= preset_values.TP_DAMAGE_HEALTH
 	
 	
 	# ================== LINKED COMPONENTS
@@ -149,10 +147,10 @@ func tick_update() -> void:
 	# Damage Solar Panel Chance
 	if StormsEnabled and SolarPanEnabled:
 		if StormOccurring == STORMS.SLOW:
-			if randf() >= preset_values.SLOW_STORM_SP_DAMAGE_CHANCE:
+			if randf() < preset_values.SLOW_STORM_SP_DAMAGE_CHANCE:
 				SolarPanels -= 1
 		if StormOccurring == STORMS.FAST:
-			if randf() >= preset_values.FAST_STORM_SP_DAMAGE_CHANCE:
+			if randf() < preset_values.FAST_STORM_SP_DAMAGE_CHANCE:
 				SolarPanels -= 1
 		if SolarPanels < 0:
 			SolarPanels = 0
@@ -178,22 +176,22 @@ func tick_update() -> void:
 		Power -= preset_values.RADIATION_SHIELDING_POWER_DECREASE
 		if Radiation < 0:
 			Radiation = 0
-		# stops button if insufficient power
-		if Power < preset_values.RADIATION_SHIELDING_RADIATION_DECREASE:
+		if Power <= 0:
 			RadiationShieldingUsing = false
+			Power = 0
 	
 	# Decreases Toxic Perchlorates if Air Filtering
 	if ToxicPerchEnabled and OxygenEnabled and AirFilteringEnabled and AirFilteringUsing:
 		ToxicPerch -= preset_values.AIR_FILTERING_TP_DECREASE
 		Power -= preset_values.AIR_FILTERING_POWER_DECREASE
 		if ToxicPerch < 0:
-			Radiation = 0
-		# stops button if insufficient power
-		if Power < preset_values.AIR_FILTERING_POWER_DECREASE:
+			ToxicPerch = 0
+		if Power <= 0:
 			AirFilteringUsing = false
+			Power = 0
 	
 	
-	
+	print("Health: " + str(health_scene.Health))
 	
 	
 	print("Storm Occurring: " + str(StormOccurring) + " | Solar Event Occurring: " + str(SolarEventOccurring))
