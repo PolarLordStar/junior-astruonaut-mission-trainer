@@ -3,7 +3,7 @@ extends Node3D
 ## Every model is measured when the scene starts, so no manual scaling is needed.
 ##
 ## Monitor 1 ("status"):      power supply, solar panel durability (6 panels), oxygen supply   (ScreenUI.gd, status_screen.tscn)
-## Monitor 2 ("environment"): radiation, oxygen, toxic perchlorate                              (environment_screen.gd)
+## Monitor 2 ("environment"): radiation, toxic perchlorate                                            (environment_screen.gd)
 ## Monitor 3 ("alerts"):      ONLY active warnings, black screen when there are none           (warnings_screen.gd)
 ## Esc opens the pause menu (see PauseMenu.gd).
 ##
@@ -55,6 +55,7 @@ const SHOW_MENU_ON_START := false
 # ---- data nodes: CHILD nodes of ControlRoom, found automatically by group (names/order do not matter) ----
 var storm: StormSystem
 var clock: MissionClock
+var components   # the Components object (components.gd) that the Game node owns; null when control_room.tscn runs on its own
 var sensors := {}            # sensor id -> Sensor ("power", "oxygen", "panels", "radiation", "perchlorate" ...)
 
 # read-only shortcuts so the visual code below keeps working with the old names
@@ -166,6 +167,7 @@ func _process(delta: float) -> void:
 func _find_nodes() -> void:
 	storm = get_tree().get_first_node_in_group("storm") as StormSystem
 	clock = get_tree().get_first_node_in_group("clock") as MissionClock
+	components = _find_components()
 	for n in get_tree().get_nodes_in_group("sensors"):
 		var sen := n as Sensor
 		if sen != null:
@@ -315,11 +317,24 @@ func _push_screens() -> void:
 		al.set_warnings(_warnings)
 
 
-## Everything that should show on monitor 3 right now: the storm, plus whatever each sensor
-## reports through its own get_warning() (edit the warning text in that sensor's script).
+## Looks up through the parents for the node that owns the Components (the Game node).
+func _find_components():
+	var n := get_parent()
+	while n != null:
+		if "components_script" in n:
+			return n.components_script
+		n = n.get_parent()
+	return null
+
+
+## Everything that should show on monitor 3 right now: the events (from Components when the game is
+## running, otherwise the built-in StormSystem simulation), plus whatever each sensor reports
+## through its own get_warning() (edit the warning text in that sensor's script).
 func _collect_warnings() -> Array:
 	var out: Array = []
-	if storm_phase == 1:
+	if components != null:
+		out.append_array(_event_warnings())
+	elif storm_phase == 1:
 		out.append({"id": "storm", "title": "%s INCOMING" % storm_type, "detail": "Arrives in %s" % _mmss(storm_eta), "badge": _storm_badge(), "level": storm_level})
 	elif storm_phase == 2:
 		out.append({"id": "storm", "title": "%s ACTIVE" % storm_type, "detail": "Passes in %s" % _mmss(storm_left), "badge": _storm_badge(), "level": storm_level})
@@ -327,6 +342,28 @@ func _collect_warnings() -> Array:
 		var w: Dictionary = sen.get_warning()
 		if not w.is_empty():
 			out.append(w)
+	return out
+
+
+## One card per event in Components.events_to_occur ({event : severity} : seconds until it occurs)
+## and Components.events_occurring ({event : severity} : seconds until it ends).
+## The event name already says "Incoming" where it should, so nothing is added to it; both cards show severity + timer.
+func _event_warnings() -> Array:
+	var out: Array = []
+	for event in components.events_to_occur:
+		if event is Dictionary and not event.is_empty():
+			var ev_name := str(event.keys()[0])
+			var sev := int(event[ev_name])
+			out.append({"id": "incoming_" + ev_name.validate_node_name(), "title": ev_name.to_upper(),
+					"detail": "Arrives in %s" % _mmss(components.events_to_occur[event]),
+					"badge": "SEVERITY %d" % sev, "level": clampi(sev, 1, 3)})
+	for event in components.events_occurring:
+		if event is Dictionary and not event.is_empty():
+			var ev_name := str(event.keys()[0])
+			var sev := int(event[ev_name])
+			out.append({"id": "occurring_" + ev_name.validate_node_name(), "title": "%s ACTIVE" % ev_name.to_upper(),
+					"detail": "Ends in %s" % _mmss(components.events_occurring[event]),
+					"badge": "SEVERITY %d" % sev, "level": clampi(sev, 1, 3)})
 	return out
 
 
@@ -768,7 +805,7 @@ func _desk() -> Dictionary:
 	var mon_y := 0.145 + 0.475 * MONITOR_SCALE
 	var mon_side := 0.76 * MONITOR_SCALE * (1.0 + cos(deg_to_rad(16.0))) + 0.12
 	_monitor(rig, _status_viewport, Vector3(-mon_side, mon_y, -0.2), 16.0)    # left: life support
-	_monitor(rig, _env_viewport, Vector3(0.0, mon_y, -0.42), 0.0)             # middle: radiation / oxygen / perchlorate
+	_monitor(rig, _env_viewport, Vector3(0.0, mon_y, -0.42), 0.0)             # middle: radiation / perchlorate
 	_monitor(rig, _alerts_viewport, Vector3(mon_side, mon_y, -0.2), -16.0)    # right: warnings only
 	_box(rig, Vector3(0, 0.02, 0.45), Vector3(1.1, 0.04, 0.35), DARK)              # keyboard
 	_box(rig, Vector3(1.05, 0.008, 0.5), Vector3(0.5, 0.016, 0.4), Color("17181d"))  # mouse pad
