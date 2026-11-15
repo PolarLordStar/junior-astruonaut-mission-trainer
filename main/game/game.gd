@@ -78,7 +78,6 @@ func _on_transition_main_menu() -> void:
 func _ready() -> void:
 	add_child(loading_screen)
 	day_transition.continue_pressed.connect(_on_transition_continue)
-	day_transition.continue_pressed.connect(_on_transition_continue)
 	day_transition.main_menu_pressed.connect(_on_transition_main_menu)
 	_status_screen.show_power()
 	_status_screen.hide_oxygen()
