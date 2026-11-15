@@ -1223,3 +1223,24 @@ func _no_shadow(n: Node) -> void:
 		(n as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for c in n.get_children():
 		_no_shadow(c)
+
+
+# ENABLING AND DISABLING DESK BUTTONS
+func show_radiation_shielding_button() -> void:  _set_button_visible(0, true)
+func hide_radiation_shielding_button() -> void:  _set_button_visible(0, false)
+
+func show_air_filtering_button() -> void:        _set_button_visible(1, true)
+func hide_air_filtering_button() -> void:        _set_button_visible(1, false)
+
+func show_cover_solar_panels_button() -> void:   _set_button_visible(2, true)
+func hide_cover_solar_panels_button() -> void:   _set_button_visible(2, false)
+
+func _set_button_visible(index: int, on: bool) -> void:
+	if index >= _action_buttons.size():
+		return
+	var b := _action_buttons[index]
+	b.get_parent().visible = on   # the Station: plate, orange bar, button and label together
+	if not on:
+		b.set_on(false)           # a hidden button goes back to OFF (this does not toggle the component)
+		if _hovered == b:
+			_set_hovered(null)    # drops the hand cursor

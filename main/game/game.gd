@@ -9,6 +9,7 @@ var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var _status_screen: ScreenUI = $ControlRoom/StatusViewport/StatusScreen
 @onready var _env_screen: EnvironmentScreen = $ControlRoom/EnvironmentViewport/EnvironmentScreen
 @onready var storm_system: StormSystem = $ControlRoom/StormSystem
+@onready var _room = $ControlRoom
 
 var day_number: int = save_script.load_day()
 var date
@@ -78,6 +79,9 @@ func _ready() -> void:
 	_status_screen.hide_solar_panels()
 	_env_screen.show_radiation()
 	_env_screen.hide_perchlorate()
+	_room.show_radiation_shielding_button()
+	_room.hide_air_filtering_button()
+	_room.hide_cover_solar_panels_button()
 	
 	start()
 
@@ -175,6 +179,9 @@ func update_day_by_day_components() -> void:
 			components_scene.RadiationShieldingEnabled = true
 			components_scene.AirFilteringEnabled = false
 			components_scene.CoverSolarPanEnabled = false
+			_room.show_radiation_shielding_button()
+			_room.hide_air_filtering_button()
+			_room.hide_cover_solar_panels_button()
 		
 		2:
 			components_scene.PowerEnabled = true
@@ -196,6 +203,9 @@ func update_day_by_day_components() -> void:
 			components_scene.RadiationShieldingEnabled = true
 			components_scene.AirFilteringEnabled = true
 			components_scene.CoverSolarPanEnabled = false
+			_room.show_radiation_shielding_button()
+			_room.show_air_filtering_button()
+			_room.hide_cover_solar_panels_button()
 		
 		3:
 			components_scene.PowerEnabled = true
@@ -217,6 +227,9 @@ func update_day_by_day_components() -> void:
 			components_scene.RadiationShieldingEnabled = true
 			components_scene.AirFilteringEnabled = true
 			components_scene.CoverSolarPanEnabled = true
+			_room.show_radiation_shielding_button()
+			_room.show_air_filtering_button()
+			_room.show_cover_solar_panels_button()
 		
 		4:
 			components_scene.PowerEnabled = true
@@ -238,6 +251,9 @@ func update_day_by_day_components() -> void:
 			components_scene.RadiationShieldingEnabled = true
 			components_scene.AirFilteringEnabled = true
 			components_scene.CoverSolarPanEnabled = true
+			_room.show_radiation_shielding_button()
+			_room.show_air_filtering_button()
+			_room.show_cover_solar_panels_button()
 		
 		5:
 			components_scene.PowerEnabled = true
@@ -259,6 +275,9 @@ func update_day_by_day_components() -> void:
 			components_scene.RadiationShieldingEnabled = true
 			components_scene.AirFilteringEnabled = true
 			components_scene.CoverSolarPanEnabled = true
+			_room.show_radiation_shielding_button()
+			_room.show_air_filtering_button()
+			_room.show_cover_solar_panels_button()
 
 func _updating_tick() -> void:
 	components_scene.tick_update()
