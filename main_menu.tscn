@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://xq51b2hwyyxm" path="res://scripts/restart_button.gd" id="4_8qtwp"]
 [ext_resource type="Script" uid="uid://dsfu0vabmujem" path="res://scripts/options_button.gd" id="5_dy7ct"]
 [ext_resource type="Script" uid="uid://b86813jd5oc35" path="res://scripts/exit_button.gd" id="6_0o4t1"]
+[ext_resource type="Script" uid="uid://kdneki3w7m5" path="res://scripts/how_to_play_button.gd" id="7_howto"]
 
 [node name="MainMenu" type="Control" unique_id=774578069]
 layout_mode = 3
@@ -46,6 +47,11 @@ script = ExtResource("3_qe12f")
 layout_mode = 2
 text = "Restart"
 script = ExtResource("4_8qtwp")
+
+[node name="HowToPlay" type="Button" parent="CenterContainer/VBoxContainer" unique_id=782295351]
+layout_mode = 2
+text = "How to play"
+script = ExtResource("7_howto")
 
 [node name="Options" type="Button" parent="CenterContainer/VBoxContainer" unique_id=644529383]
 layout_mode = 2
