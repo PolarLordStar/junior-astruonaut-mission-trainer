@@ -4,6 +4,8 @@ var player_script = preload("res://main/game/player/player.gd").new()
 var save_script = preload("res://scripts/save_manager.gd").new()
 @onready var components_scene = get_node("Components")
 @onready var day_counter: CanvasLayer = $DayCounter
+@onready var day_transition: CanvasLayer = $DayTransition   # "You have survived!" screen (ui/day_transition.tscn)
+
 
 var day_number: int = save_script.load_day()
 var date
@@ -53,27 +55,33 @@ func start() -> void:
 func _on_day_end() -> void:
 	$Timers/DayTimer.stop()
 	$Timers/TickUpdateTimer.stop()
-	if day_number < preset_values.MAX_DAYS:
-		start()
-	# ...screen saying day number survived
+	get_tree().paused = true
+	day_transition.show_transition(day_number < preset_values.MAX_DAYS)
+
+func _on_transition_continue() -> void:
+	$Timers/DayTimer.wait_time = preset_values.DAY_DURATION
+	get_tree().paused = false
+	start()
+
+func _on_transition_main_menu() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://main_menu.tscn")
+
 func _ready() -> void:
 	player_script.hurt.connect(_on_player_hurt)
 	player_script.died.connect(_on_player_died)
+	day_transition.continue_pressed.connect(_on_transition_continue)
+	day_transition.main_menu_pressed.connect(_on_transition_main_menu)
 	start()
-
 
 # PLAYER SOUNDS (scripts/game_sounds.gd, room/scripts/ambience_player.gd)
 func _on_player_hurt() -> void:
 	GameSounds.play_hurt()
-
-
 func _on_player_died() -> void:
 	GameSounds.play_death()
 	var ambience := _get_ambience()
 	if ambience != null:
 		ambience.stop_ambience()   # the control room goes quiet when the player dies
-
-
 func _get_ambience() -> AmbiencePlayer:
 	return get_tree().get_first_node_in_group("ambience") as AmbiencePlayer
 
