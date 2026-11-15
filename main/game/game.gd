@@ -45,11 +45,10 @@ func _ready() -> void:
 
 # EVENTS
 func start_event_timers() -> void:
-	# Clear any leftover event timers from the previous day. Only the timers made for events
-	# (they are in the group "event_timers") are removed, so DayTimer and TickUpdateTimer,
-	# which are part of the scene, stay.
-	for child in get_tree().get_nodes_in_group("event_timers"):
-		child.queue_free()
+	# Clear any leftover event timers from the previous day
+	for child in $Timers.get_children():
+		if child.name != "DayTimer" && child.name != "TickUpdateTimer":
+			child.queue_free()
 	
 	
 	# Loop through each {event: severity} : delay_time pair
@@ -60,7 +59,6 @@ func start_event_timers() -> void:
 		event_timer.wait_time = delay_time
 		event_timer.one_shot = true
 		$Timers.add_child(event_timer)
-		event_timer.add_to_group("event_timers")
 		
 		# Connect timeout signal and pass the event data and presets
 		event_timer.timeout.connect(_on_event_timer_timeout.bind(event_dict, preset_values.EVENT_DURATION, event_timer))
@@ -79,7 +77,6 @@ func _on_event_timer_timeout(event_dict: Dictionary, duration: float, start_time
 	end_timer.wait_time = duration
 	end_timer.one_shot = true
 	$Timers.add_child(end_timer)
-	end_timer.add_to_group("event_timers")
 	
 	end_timer.timeout.connect(_on_event_duration_timeout.bind(event_dict, end_timer))
 	end_timer.start()
